@@ -15,9 +15,9 @@ export const refreshTokens = pgTable(
     expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
     createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
     revokedAt: timestamp('revoked_at', { mode: 'date' }),
-    replacedBy: uuid('replaced_by').references(() => refreshTokens.id, {
-      onDelete: 'set null',
-    }),
+    // Self-reference: which token replaced this one (for rotation tracking)
+    // Note: Foreign key constraint should be added via migration to avoid circular dependency
+    replacedBy: uuid('replaced_by'),
   },
   (table) => ({
     userIdIdx: index('refresh_tokens_user_id_idx').on(table.userId),
