@@ -1,0 +1,55 @@
+Proprietary License
+
+Copyright (c) 2025 Mamba Host. All Rights Reserved.
+
+TERMS AND CONDITIONS
+
+1. GRANT OF LICENSE
+   This software and associated documentation files (the "Software") are the
+   proprietary property of Mamba Host. By accessing or using the Software, you
+   are granted a limited, non-exclusive, non-transferable, revocable license to
+   access and use the website and its features solely for their intended purpose.
+
+2. RESTRICTIONS
+   You are expressly prohibited from:
+   a) Copying, modifying, or creating derivative works of the Software
+   b) Reverse engineering, decompiling, or disassembling the Software
+   c) Distributing, sublicensing, leasing, or transferring the Software
+   d) Removing or altering any proprietary notices or labels on the Software
+   e) Using the Software for any purpose other than accessing the website and
+      its features as intended
+   f) Extracting or scraping any content, data, or code from the Software
+
+3. COMMERCIAL USE
+   Any commercial use of the Software requires express written permission from
+   Mamba Host. To request commercial licensing, please contact Mamba Host.
+
+4. INTELLECTUAL PROPERTY
+   All intellectual property rights, including but not limited to copyrights,
+   trademarks, patents, and trade secrets in the Software remain the exclusive
+   property of Mamba Host.
+
+5. TERMINATION
+   This license is effective until terminated. Your rights under this license
+   will terminate automatically without notice if you fail to comply with any
+   of its terms. Upon termination, you must cease all use of the Software.
+
+6. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
+   MAMBA HOST BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN
+   AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+7. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL MAMBA HOST BE LIABLE FOR ANY SPECIAL, INCIDENTAL,
+   INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER ARISING OUT OF THE USE OF OR
+   INABILITY TO USE THE SOFTWARE.
+
+8. GOVERNING LAW
+   This license shall be governed by and construed in accordance with the laws
+   of the jurisdiction in which Mamba Host operates, without regard to its
+   conflict of law provisions.
+
+For inquiries regarding licensing or permissions, please contact Mamba Host.
