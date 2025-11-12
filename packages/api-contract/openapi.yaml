@@ -1,0 +1,345 @@
+openapi: 3.0.3
+info:
+  title: Wings Daemon API
+  description: API specification for the Wings daemon that manages game server containers
+  version: 1.0.0
+  contact:
+    name: GamePanel
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://wings.example.com
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /api/system/status:
+    get:
+      summary: Get system status
+      description: Returns system information including resource usage
+      operationId: getSystemStatus
+      tags:
+        - System
+      responses:
+        '200':
+          description: System status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/servers/{serverId}/power:
+    post:
+      summary: Execute power action on server
+      description: Start, stop, restart, or kill a game server container
+      operationId: serverPowerAction
+      tags:
+        - Servers
+      parameters:
+        - name: serverId
+          in: path
+          required: true
+          description: The UUID of the server
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PowerAction'
+      responses:
+        '200':
+          description: Power action executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/servers/{serverId}/logs:
+    get:
+      summary: Get server logs
+      description: Retrieve recent logs from a game server container
+      operationId: getServerLogs
+      tags:
+        - Servers
+      parameters:
+        - name: serverId
+          in: path
+          required: true
+          description: The UUID of the server
+          schema:
+            type: string
+            format: uuid
+        - name: lines
+          in: query
+          required: false
+          description: Number of log lines to retrieve
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+      responses:
+        '200':
+          description: Logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerLogs'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/servers/{serverId}/command:
+    post:
+      summary: Send command to server
+      description: Execute a command in the game server container
+      operationId: sendServerCommand
+      tags:
+        - Servers
+      parameters:
+        - name: serverId
+          in: path
+          required: true
+          description: The UUID of the server
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServerCommand'
+      responses:
+        '200':
+          description: Command sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/servers/{serverId}/stats:
+    get:
+      summary: Get server statistics
+      description: Retrieve resource usage statistics for a game server
+      operationId: getServerStats
+      tags:
+        - Servers
+      parameters:
+        - name: serverId
+          in: path
+          required: true
+          description: The UUID of the server
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerStats'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticating requests from the panel API
+
+  schemas:
+    SystemStatus:
+      type: object
+      required:
+        - version
+        - uptime
+        - cpuCount
+        - memoryTotal
+        - memoryAvailable
+        - diskTotal
+        - diskAvailable
+      properties:
+        version:
+          type: string
+          description: Wings daemon version
+          example: '1.0.0'
+        uptime:
+          type: integer
+          description: System uptime in seconds
+          example: 86400
+        cpuCount:
+          type: integer
+          description: Number of CPU cores
+          example: 8
+        memoryTotal:
+          type: integer
+          description: Total memory in bytes
+          example: 16777216000
+        memoryAvailable:
+          type: integer
+          description: Available memory in bytes
+          example: 8388608000
+        diskTotal:
+          type: integer
+          description: Total disk space in bytes
+          example: 1099511627776
+        diskAvailable:
+          type: integer
+          description: Available disk space in bytes
+          example: 549755813888
+
+    PowerAction:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum: [start, stop, restart, kill]
+          description: Power action to execute
+
+    ServerCommand:
+      type: object
+      required:
+        - command
+      properties:
+        command:
+          type: string
+          description: Command to execute in the server
+          example: 'say Hello World'
+
+    ServerLogs:
+      type: object
+      required:
+        - logs
+      properties:
+        logs:
+          type: array
+          items:
+            type: string
+          description: Array of log lines
+
+    ServerStats:
+      type: object
+      required:
+        - cpuUsage
+        - memoryUsage
+        - diskUsage
+        - networkRx
+        - networkTx
+        - uptime
+      properties:
+        cpuUsage:
+          type: number
+          format: float
+          description: CPU usage percentage
+          example: 45.5
+        memoryUsage:
+          type: integer
+          description: Memory usage in bytes
+          example: 2147483648
+        diskUsage:
+          type: integer
+          description: Disk usage in bytes
+          example: 10737418240
+        networkRx:
+          type: integer
+          description: Network received in bytes
+          example: 1048576
+        networkTx:
+          type: integer
+          description: Network transmitted in bytes
+          example: 2097152
+        uptime:
+          type: integer
+          description: Container uptime in seconds
+          example: 3600
+
+    SuccessResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Operation completed successfully'
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Error message
+          example: 'Invalid request parameters'
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

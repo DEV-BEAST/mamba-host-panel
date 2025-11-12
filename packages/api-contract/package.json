@@ -1,0 +1,13 @@
+{
+  "name": "@gamePanel/api-contract",
+  "version": "1.0.0",
+  "private": true,
+  "main": "openapi.yaml",
+  "files": ["openapi.yaml"],
+  "scripts": {
+    "validate": "npx @apidevtools/swagger-cli validate openapi.yaml"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-cli": "^4.0.4"
+  }
+}
