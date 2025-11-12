@@ -1,11 +1,10 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { Database } from '@mambaPanel/db';
-import { webhookEvents, subscriptions, invoices } from '@mambaPanel/db';
-import { eq } from 'drizzle-orm';
+import { webhookEvents, subscriptions, invoices, eq } from '@mambaPanel/db';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2023-10-16',
 });
 
 /**
@@ -170,11 +169,11 @@ async function handleInvoicePaymentFailed(
 ) {
   logger.warn(`Invoice ${invoice.id} payment failed`);
 
-  // Update invoice status
+  // Update invoice status to 'open' (payment failed but invoice remains open for retry)
   await db
     .update(invoices)
     .set({
-      status: 'failed',
+      status: 'open',
     })
     .where(eq(invoices.stripeInvoiceId, invoice.id));
 
@@ -218,11 +217,18 @@ async function handleSubscriptionUpdated(
     .limit(1);
 
   if (existingSub) {
+    // Map Stripe subscription status to our enum (filter out unsupported statuses like 'paused')
+    const allowedStatuses = ['active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'trialing', 'unpaid'] as const;
+    type AllowedStatus = typeof allowedStatuses[number];
+    const mappedStatus: AllowedStatus = allowedStatuses.includes(subscription.status as any)
+      ? (subscription.status as AllowedStatus)
+      : 'canceled'; // Default to canceled for unmapped statuses
+
     // Update existing subscription
     await db
       .update(subscriptions)
       .set({
-        status: subscription.status,
+        status: mappedStatus,
         currentPeriodStart: new Date(subscription.current_period_start * 1000),
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
         cancelAt: subscription.cancel_at
