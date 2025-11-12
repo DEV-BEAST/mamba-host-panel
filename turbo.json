@@ -22,7 +22,7 @@
     "MINIO_SECRET_KEY",
     "MINIO_BUCKET"
   ],
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "build/**"],
