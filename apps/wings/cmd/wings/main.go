@@ -6,10 +6,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/mambapanel/wings/internal/api"
 	"github.com/mambapanel/wings/internal/config"
+	"github.com/mambapanel/wings/internal/crashguard"
 	"github.com/mambapanel/wings/internal/docker"
+	"github.com/mambapanel/wings/internal/metrics"
+	"github.com/mambapanel/wings/internal/mtls"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -41,6 +45,60 @@ func main() {
 
 	logger.Info("Docker client initialized successfully")
 
+	// Load mTLS configuration
+	mtlsConfig, err := mtls.LoadClientConfig()
+	if err != nil {
+		logger.Warn("mTLS configuration not available, some features will be disabled", zap.Error(err))
+	}
+
+	var apiClient *mtls.APIClient
+	if mtlsConfig != nil {
+		// Verify mTLS setup
+		if err := mtls.VerifyClientSetup(mtlsConfig); err != nil {
+			logger.Warn("mTLS setup verification failed", zap.Error(err))
+		} else {
+			// Create API client for metrics and events
+			apiClient, err = mtls.NewAPIClient(mtlsConfig)
+			if err != nil {
+				logger.Error("Failed to create API client", zap.Error(err))
+			} else {
+				logger.Info("mTLS API client initialized successfully")
+			}
+		}
+	}
+
+	// Initialize Phase 5 services
+	var metricsEmitter *metrics.Emitter
+	var crashGuard *crashguard.Guard
+
+	if apiClient != nil && mtlsConfig != nil {
+		// Start metrics emitter
+		metricsEmitter = metrics.NewEmitter(dockerClient, apiClient, mtlsConfig.NodeID, logger)
+		go metricsEmitter.Start()
+		logger.Info("Metrics emitter started")
+
+		// Start crash guard
+		crashGuard = crashguard.NewGuard(dockerClient, apiClient, mtlsConfig.NodeID, logger)
+		crashGuard.Start()
+		logger.Info("Crash guard started")
+
+		// Start heartbeat ticker
+		go func() {
+			ticker := time.NewTicker(60 * time.Second)
+			defer ticker.Stop()
+
+			for range ticker.C {
+				if err := metricsEmitter.Heartbeat(); err != nil {
+					logger.Error("Failed to send heartbeat", zap.Error(err))
+				} else {
+					logger.Debug("Heartbeat sent successfully")
+				}
+			}
+		}()
+	} else {
+		logger.Warn("Phase 5 services disabled: mTLS API client not available")
+	}
+
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
@@ -65,6 +123,19 @@ func main() {
 	<-quit
 
 	logger.Info("Shutting down server...")
+
+	// Stop Phase 5 services
+	if metricsEmitter != nil {
+		metricsEmitter.Stop()
+		logger.Info("Metrics emitter stopped")
+	}
+
+	if crashGuard != nil {
+		crashGuard.Stop()
+		logger.Info("Crash guard stopped")
+	}
+
+	// Shutdown HTTP server
 	if err := app.Shutdown(); err != nil {
 		logger.Error("Server forced to shutdown", zap.Error(err))
 	}
