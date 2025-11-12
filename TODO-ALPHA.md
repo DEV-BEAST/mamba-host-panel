@@ -29,277 +29,277 @@
 
 ---
 
-## 🔨 Phase 1: Alpha Core Architecture (P0)
+## ✅ Phase 1: Alpha Core Architecture (P0) - COMPLETED
 
 ### 0. Repository Structure Additions
 
 #### New Applications
-- [ ] **apps/worker** (NestJS + BullMQ)
-  - [ ] Create NestJS application with BullMQ
-  - [ ] Configure BullMQ connection to Redis
-  - [ ] Set up job processors structure
-  - [ ] Add Pino logging
-  - [ ] Wire into turbo.json
-  - [ ] Add Dockerfile
-  - [ ] Update docker-compose.yml
+- [x] **apps/worker** (NestJS + BullMQ)
+  - [x] Create NestJS application with BullMQ
+  - [x] Configure BullMQ connection to Redis
+  - [x] Set up job processors structure
+  - [x] Add Pino logging
+  - [x] Wire into turbo.json
+  - [x] Add Dockerfile
+  - [x] Update docker-compose.yml
 
-- [ ] **apps/billing-webhooks** (Fastify)
-  - [ ] Create standalone Fastify app
-  - [ ] Stripe webhook signature verification
-  - [ ] Idempotency key handling
-  - [ ] Event storage (webhook_events table)
-  - [ ] Retry logic with exponential backoff
-  - [ ] Wire into turbo.json
-  - [ ] Add Dockerfile
-  - [ ] Update docker-compose.yml
+- [x] **apps/billing-webhooks** (Fastify)
+  - [x] Create standalone Fastify app
+  - [x] Stripe webhook signature verification
+  - [x] Idempotency key handling
+  - [x] Event storage (webhook_events table)
+  - [x] Retry logic with exponential backoff
+  - [x] Wire into turbo.json
+  - [x] Add Dockerfile
+  - [x] Update docker-compose.yml
 
 #### New Packages
-- [ ] **packages/authz** (RBAC system)
-  - [ ] Define permission keys enum
-  - [ ] Define roles enum (OWNER, ADMIN, SUPPORT, MEMBER)
-  - [ ] Create permission checking utilities
-  - [ ] NestJS guards (RequirePermission, RequireTenant)
-  - [ ] React hooks (usePermissions, useHasPermission)
-  - [ ] Wire into turbo.json
-  - [ ] Add to pnpm-workspace.yaml
+- [x] **packages/authz** (RBAC system)
+  - [x] Define permission keys enum
+  - [x] Define roles enum (OWNER, ADMIN, SUPPORT, MEMBER)
+  - [x] Create permission checking utilities
+  - [x] NestJS guards (RequirePermission, RequireTenant)
+  - [x] React hooks (usePermissions, useHasPermission)
+  - [x] Wire into turbo.json
+  - [x] Add to pnpm-workspace.yaml
 
-- [ ] **packages/alloc** (Resource allocator)
-  - [ ] Postgres-backed port allocator
-  - [ ] IP pool allocator
-  - [ ] Atomic reservation functions
-  - [ ] Leak scanner (orphaned allocations)
-  - [ ] Release by owner/server
-  - [ ] Wire into turbo.json
-  - [ ] Add to pnpm-workspace.yaml
+- [x] **packages/alloc** (Resource allocator)
+  - [x] Postgres-backed port allocator
+  - [x] IP pool allocator
+  - [x] Atomic reservation functions
+  - [x] Leak scanner (orphaned allocations)
+  - [x] Release by owner/server
+  - [x] Wire into turbo.json
+  - [x] Add to pnpm-workspace.yaml
 
-- [ ] **packages/metrics-sdk** (Usage tracking)
-  - [ ] Typed usage payload definitions
-  - [ ] Heartbeat client for Wings
-  - [ ] Metrics aggregation utilities
-  - [ ] Sample validation schemas
-  - [ ] Wire into turbo.json
-  - [ ] Add to pnpm-workspace.yaml
+- [x] **packages/metrics-sdk** (Usage tracking)
+  - [x] Typed usage payload definitions
+  - [x] Heartbeat client for Wings
+  - [x] Metrics aggregation utilities
+  - [x] Sample validation schemas
+  - [x] Wire into turbo.json
+  - [x] Add to pnpm-workspace.yaml
 
-- [ ] **packages/audit** (Audit logging)
-  - [ ] Append-only audit log writer
-  - [ ] Audit event type definitions
-  - [ ] Actor/target/action schema
-  - [ ] Drizzle integration
-  - [ ] Query utilities (tenant-scoped)
-  - [ ] Wire into turbo.json
-  - [ ] Add to pnpm-workspace.yaml
+- [x] **packages/audit** (Audit logging)
+  - [x] Append-only audit log writer
+  - [x] Audit event type definitions
+  - [x] Actor/target/action schema
+  - [x] Drizzle integration
+  - [x] Query utilities (tenant-scoped)
+  - [x] Wire into turbo.json
+  - [x] Add to pnpm-workspace.yaml
 
-- [ ] **packages/notifications** (Multi-channel notifications)
-  - [ ] Email provider (Resend/Postmark)
-  - [ ] Discord webhook client
-  - [ ] Web push (optional for alpha)
-  - [ ] Template system
-  - [ ] Notification preferences
-  - [ ] Wire into turbo.json
-  - [ ] Add to pnpm-workspace.yaml
+- [x] **packages/notifications** (Multi-channel notifications)
+  - [x] Email provider (Resend/Postmark)
+  - [x] Discord webhook client
+  - [x] Web push (optional for alpha)
+  - [x] Template system
+  - [x] Notification preferences
+  - [x] Wire into turbo.json
+  - [x] Add to pnpm-workspace.yaml
 
-- [ ] **packages/blueprints** (Game templates)
-  - [ ] Blueprint schema definition
-  - [ ] Minecraft Vanilla template
-  - [ ] Minecraft Paper template
-  - [ ] Valheim template
-  - [ ] Blueprint validator
-  - [ ] Variable interpolation
-  - [ ] Wire into turbo.json
-  - [ ] Add to pnpm-workspace.yaml
+- [x] **packages/blueprints** (Game templates)
+  - [x] Blueprint schema definition
+  - [x] Minecraft Vanilla template
+  - [x] Minecraft Paper template
+  - [x] Valheim template
+  - [x] Blueprint validator
+  - [x] Variable interpolation
+  - [x] Wire into turbo.json
+  - [x] Add to pnpm-workspace.yaml
 
 #### Configuration Updates
-- [ ] Update turbo.json with new packages/apps
-- [ ] Update pnpm-workspace.yaml
-- [ ] Update .github/workflows/ci.yml
-- [ ] Update root README.md with new structure
-- [ ] Update docker-compose.yml with all services
+- [x] Update turbo.json with new packages/apps
+- [x] Update pnpm-workspace.yaml
+- [x] Update .github/workflows/ci.yml
+- [x] Update root README.md with new structure
+- [x] Update docker-compose.yml with all services
 
 ---
 
-## 📊 Phase 2: Database Schema & Migrations (P0)
+## ✅ Phase 2: Database Schema & Migrations (P0) - COMPLETED
 
 ### Tenancy & RBAC Tables
 - [x] **tenants table**
-  - [ ] id, name, slug, plan_tier, status, created_at, updated_at
-  - [ ] Unique constraint on slug
-  - [ ] Indexes
+  - [x] id, name, slug, plan_tier, status, created_at, updated_at
+  - [x] Unique constraint on slug
+  - [x] Indexes
 
 - [x] **tenant_members table**
-  - [ ] id, tenant_id, user_id, role, invited_by, joined_at
-  - [ ] Unique constraint on (tenant_id, user_id)
-  - [ ] Foreign keys with cascade
-  - [ ] Indexes
+  - [x] id, tenant_id, user_id, role, invited_by, joined_at
+  - [x] Unique constraint on (tenant_id, user_id)
+  - [x] Foreign keys with cascade
+  - [x] Indexes
 
 - [x] **roles table**
-  - [ ] id, name, description, system_role (boolean)
-  - [ ] Pre-seed: OWNER, ADMIN, SUPPORT, MEMBER
+  - [x] id, name, description, system_role (boolean)
+  - [x] Pre-seed: OWNER, ADMIN, SUPPORT, MEMBER
 
 - [x] **permissions table**
-  - [ ] id, key, resource, action, description
-  - [ ] Pre-seed all permission keys
+  - [x] id, key, resource, action, description
+  - [x] Pre-seed all permission keys
 
 - [x] **role_permissions table**
-  - [ ] id, role_id, permission_id
-  - [ ] Unique constraint on (role_id, permission_id)
+  - [x] id, role_id, permission_id
+  - [x] Unique constraint on (role_id, permission_id)
 
 - [x] **role_bindings table**
-  - [ ] id, tenant_member_id, role_id
-  - [ ] For custom role assignments
+  - [x] id, tenant_member_id, role_id
+  - [x] For custom role assignments
 
 ### Nodes & Allocation Tables
 - [x] **nodes table**
-  - [ ] id, name, fqdn, location, capacity_cpu_millicores, capacity_mem_mb, capacity_disk_gb
-  - [ ] status, last_heartbeat, cert_fingerprint
-  - [ ] created_at, updated_at
-  - [ ] Indexes on status, last_heartbeat
+  - [x] id, name, fqdn, location, capacity_cpu_millicores, capacity_mem_mb, capacity_disk_gb
+  - [x] status, last_heartbeat, cert_fingerprint
+  - [x] created_at, updated_at
+  - [x] Indexes on status, last_heartbeat
 
 - [x] **ip_pools table**
-  - [ ] id, node_id, ip_address, is_allocated, allocated_to_server_id
-  - [ ] Unique constraint on (node_id, ip_address)
-  - [ ] Index on is_allocated
+  - [x] id, node_id, ip_address, is_allocated, allocated_to_server_id
+  - [x] Unique constraint on (node_id, ip_address)
+  - [x] Index on is_allocated
 
 - [x] **port_pools table**
-  - [ ] id, node_id, port, protocol, is_allocated, allocated_to_server_id
-  - [ ] Unique constraint on (node_id, port, protocol)
-  - [ ] Index on is_allocated
+  - [x] id, node_id, port, protocol, is_allocated, allocated_to_server_id
+  - [x] Unique constraint on (node_id, port, protocol)
+  - [x] Index on is_allocated
 
 - [x] **allocations table**
-  - [ ] id, server_id, node_id, ip_address, ports (jsonb)
-  - [ ] status, allocated_at, released_at
-  - [ ] Unique constraint on server_id
+  - [x] id, server_id, node_id, ip_address, ports (jsonb)
+  - [x] status, allocated_at, released_at
+  - [x] Unique constraint on server_id
 
 ### Servers & Blueprints Tables
 - [x] **Extend servers table**
-  - [ ] Add tenant_id (foreign key)
-  - [ ] Add node_id (foreign key)
-  - [ ] Add allocation_id (foreign key)
-  - [ ] Add blueprint_id (foreign key)
-  - [ ] Add cpu_limit_millicores, mem_limit_mb, disk_gb
-  - [ ] Add install_status, install_log
-  - [ ] Indexes on tenant_id, node_id, status
+  - [x] Add tenant_id (foreign key)
+  - [x] Add node_id (foreign key)
+  - [x] Add allocation_id (foreign key)
+  - [x] Add blueprint_id (foreign key)
+  - [x] Add cpu_limit_millicores, mem_limit_mb, disk_gb
+  - [x] Add install_status, install_log
+  - [x] Indexes on tenant_id, node_id, status
 
 - [x] **blueprints table**
-  - [ ] id, game_slug, name, version, docker_image
-  - [ ] startup_command, config_files (jsonb), variables (jsonb)
-  - [ ] install_script, requires_allocation
-  - [ ] created_at, updated_at
-  - [ ] Index on game_slug
+  - [x] id, game_slug, name, version, docker_image
+  - [x] startup_command, config_files (jsonb), variables (jsonb)
+  - [x] install_script, requires_allocation
+  - [x] created_at, updated_at
+  - [x] Index on game_slug
 
 ### Backups & Metrics Tables
 - [x] **backups table**
-  - [ ] id, server_id, tenant_id, name, size_bytes
-  - [ ] status, storage_path, backup_type
-  - [ ] created_at, completed_at, expires_at
-  - [ ] Indexes on server_id, tenant_id, status
+  - [x] id, server_id, tenant_id, name, size_bytes
+  - [x] status, storage_path, backup_type
+  - [x] created_at, completed_at, expires_at
+  - [x] Indexes on server_id, tenant_id, status
 
 - [x] **metrics_hourly table**
-  - [ ] id, server_id, tenant_id, node_id
-  - [ ] hour_timestamp, cpu_millicore_avg, mem_mb_avg
-  - [ ] disk_gb_used, egress_mb_total
-  - [ ] samples_count
-  - [ ] Unique constraint on (server_id, hour_timestamp)
-  - [ ] Indexes on tenant_id, hour_timestamp
+  - [x] id, server_id, tenant_id, node_id
+  - [x] hour_timestamp, cpu_millicore_avg, mem_mb_avg
+  - [x] disk_gb_used, egress_mb_total
+  - [x] samples_count
+  - [x] Unique constraint on (server_id, hour_timestamp)
+  - [x] Indexes on tenant_id, hour_timestamp
 
 ### Billing Tables
 - [x] **products table**
-  - [ ] id, stripe_product_id, name, description
-  - [ ] active, created_at, updated_at
+  - [x] id, stripe_product_id, name, description
+  - [x] active, created_at, updated_at
 
 - [x] **prices table**
-  - [ ] id, product_id, stripe_price_id, amount, currency
-  - [ ] billing_period, metered, usage_type
-  - [ ] active, created_at, updated_at
+  - [x] id, product_id, stripe_price_id, amount, currency
+  - [x] billing_period, metered, usage_type
+  - [x] active, created_at, updated_at
 
 - [x] **subscriptions table**
-  - [ ] id, tenant_id, stripe_subscription_id, stripe_customer_id
-  - [ ] status, current_period_start, current_period_end
-  - [ ] cancel_at, canceled_at
-  - [ ] created_at, updated_at
-  - [ ] Index on tenant_id, status
+  - [x] id, tenant_id, stripe_subscription_id, stripe_customer_id
+  - [x] status, current_period_start, current_period_end
+  - [x] cancel_at, canceled_at
+  - [x] created_at, updated_at
+  - [x] Index on tenant_id, status
 
 - [x] **subscription_items table**
-  - [ ] id, subscription_id, stripe_subscription_item_id
-  - [ ] price_id, quantity
-  - [ ] created_at, updated_at
+  - [x] id, subscription_id, stripe_subscription_item_id
+  - [x] price_id, quantity
+  - [x] created_at, updated_at
 
 - [x] **usage_records table**
-  - [ ] id, subscription_item_id, tenant_id, server_id
-  - [ ] metric_type, quantity, period_start, period_end
-  - [ ] stripe_usage_record_id, reported_at
-  - [ ] Indexes on tenant_id, period_start
+  - [x] id, subscription_item_id, tenant_id, server_id
+  - [x] metric_type, quantity, period_start, period_end
+  - [x] stripe_usage_record_id, reported_at
+  - [x] Indexes on tenant_id, period_start
 
 - [x] **invoices table**
-  - [ ] id, tenant_id, subscription_id, stripe_invoice_id
-  - [ ] amount_due, amount_paid, currency, status
-  - [ ] invoice_pdf, hosted_invoice_url
-  - [ ] created_at, due_date, paid_at
-  - [ ] Index on tenant_id
+  - [x] id, tenant_id, subscription_id, stripe_invoice_id
+  - [x] amount_due, amount_paid, currency, status
+  - [x] invoice_pdf, hosted_invoice_url
+  - [x] created_at, due_date, paid_at
+  - [x] Index on tenant_id
 
 - [x] **credits table**
-  - [ ] id, tenant_id, amount, currency, description
-  - [ ] expires_at, used_at
-  - [ ] created_at
+  - [x] id, tenant_id, amount, currency, description
+  - [x] expires_at, used_at
+  - [x] created_at
 
 ### Operational Tables
 - [x] **audit_logs table**
-  - [ ] id, tenant_id, actor_id, actor_type
-  - [ ] action, resource_type, resource_id
-  - [ ] metadata (jsonb), ip_address, user_agent
-  - [ ] created_at
-  - [ ] Indexes on tenant_id, created_at, actor_id
+  - [x] id, tenant_id, actor_id, actor_type
+  - [x] action, resource_type, resource_id
+  - [x] metadata (jsonb), ip_address, user_agent
+  - [x] created_at
+  - [x] Indexes on tenant_id, created_at, actor_id
 
 - [x] **webhook_events table**
-  - [ ] id, provider, event_type, event_id
-  - [ ] payload (jsonb), processed, processed_at
-  - [ ] retry_count, last_error
-  - [ ] created_at
-  - [ ] Unique constraint on (provider, event_id)
-  - [ ] Index on processed
+  - [x] id, provider, event_type, event_id
+  - [x] payload (jsonb), processed, processed_at
+  - [x] retry_count, last_error
+  - [x] created_at
+  - [x] Unique constraint on (provider, event_id)
+  - [x] Index on processed
 
 - [x] **notifications table**
-  - [ ] id, tenant_id, user_id, channel, template
-  - [ ] subject, body, metadata (jsonb)
-  - [ ] status, sent_at, read_at
-  - [ ] created_at
-  - [ ] Indexes on user_id, status
+  - [x] id, tenant_id, user_id, channel, template
+  - [x] subject, body, metadata (jsonb)
+  - [x] status, sent_at, read_at
+  - [x] created_at
+  - [x] Indexes on user_id, status
 
 ### Migrations & Seeds
 - [x] Generate Drizzle migration
 - [x] Create seed script for demo data:
-  - [ ] 1 demo tenant ("Demo Corp")
-  - [ ] 2 users (owner, member)
-  - [ ] 2 nodes (us-east-1, us-west-1)
-  - [ ] IP/port pools for nodes
-  - [ ] 2 servers (1 Minecraft, 1 Valheim)
-  - [ ] 1 Stripe test subscription
-  - [ ] Sample hourly metrics (24h)
-  - [ ] 1 backup
-  - [ ] Audit log entries
+  - [x] 1 demo tenant ("Demo Corp")
+  - [x] 2 users (owner, member)
+  - [x] 2 nodes (us-east-1, us-west-1)
+  - [x] IP/port pools for nodes
+  - [x] 2 servers (1 Minecraft, 1 Valheim)
+  - [x] 1 Stripe test subscription
+  - [x] Sample hourly metrics (24h)
+  - [x] 1 backup
+  - [x] Audit log entries
 - [x] Document tenant filtering strategy
 
 ---
 
-## 🔒 Phase 3: Security Hardening (Alpha Scope) (P0)
+## ✅ Phase 3: Security Hardening (Alpha Scope) (P0) - COMPLETED
 
 ### mTLS for API ↔ Wings
 - [x] **Development CA Script**
-  - [ ] Create scripts/dev:ca
-  - [ ] Generate root CA certificate
-  - [ ] Issue client certificates for Wings nodes
-  - [ ] Certificate storage strategy
-  - [ ] Auto-renewal logic
+  - [x] Create scripts/dev:ca
+  - [x] Generate root CA certificate
+  - [x] Issue client certificates for Wings nodes
+  - [x] Certificate storage strategy
+  - [x] Auto-renewal logic
 
 - [x] **API mTLS Configuration**
-  - [ ] Configure Fastify for client cert validation
-  - [ ] Extract node_id from cert CN/SAN
-  - [ ] Middleware to verify cert fingerprint matches node
-  - [ ] Reject requests without valid client cert
+  - [x] Configure Fastify for client cert validation
+  - [x] Extract node_id from cert CN/SAN
+  - [x] Middleware to verify cert fingerprint matches node
+  - [x] Reject requests without valid client cert
 
 - [x] **Wings mTLS Configuration**
-  - [ ] Load client certificate on startup
-  - [ ] Configure TLS for API requests
-  - [ ] Certificate rotation handling
+  - [x] Load client certificate on startup
+  - [x] Configure TLS for API requests
+  - [x] Certificate rotation handling
 
 ### Short-Lived JWTs
 - [x] Reduce JWT expiry to 15 minutes
@@ -310,38 +310,38 @@
 
 ### Secrets Management
 - [x] **Envelope Encryption**
-  - [ ] Master key from environment (KMS-ready)
-  - [ ] Data encryption keys (DEK) per tenant
-  - [ ] Encrypt/decrypt utilities
-  - [ ] Store encrypted secrets in database
-  - [ ] Key rotation strategy
+  - [x] Master key from environment (KMS-ready)
+  - [x] Data encryption keys (DEK) per tenant
+  - [x] Encrypt/decrypt utilities
+  - [x] Store encrypted secrets in database
+  - [x] Key rotation strategy
 
 - [x] **Credential Storage**
-  - [ ] Wings daemon tokens (encrypted)
-  - [ ] Stripe API keys (encrypted)
-  - [ ] Email provider keys (encrypted)
-  - [ ] Discord webhooks (encrypted)
+  - [x] Wings daemon tokens (encrypted)
+  - [x] Stripe API keys (encrypted)
+  - [x] Email provider keys (encrypted)
+  - [x] Discord webhooks (encrypted)
 
 ### Authentication Enhancements
 - [x] **Rate Limiting**
-  - [ ] Login endpoint: 5 attempts per 15min per IP
-  - [ ] Register endpoint: 3 attempts per hour per IP
-  - [ ] Password reset: 3 attempts per hour per email
-  - [ ] Redis-backed rate limiter
+  - [x] Login endpoint: 5 attempts per 15min per IP
+  - [x] Register endpoint: 3 attempts per hour per IP
+  - [x] Password reset: 3 attempts per hour per email
+  - [x] Redis-backed rate limiter
 
 - [x] **Email Verification**
-  - [ ] Generate verification token
-  - [ ] Send verification email
-  - [ ] Verify endpoint
-  - [ ] Block unverified users from key actions
-  - [ ] Resend verification email
+  - [x] Generate verification token
+  - [x] Send verification email
+  - [x] Verify endpoint
+  - [x] Block unverified users from key actions
+  - [x] Resend verification email
 
 - [x] **TOTP 2FA (Optional)**
-  - [ ] Enable 2FA flow
-  - [ ] Generate QR code
-  - [ ] Verify TOTP code
-  - [ ] Backup codes generation
-  - [ ] 2FA enforcement at tenant level (optional flag)
+  - [x] Enable 2FA flow
+  - [x] Generate QR code
+  - [x] Verify TOTP code
+  - [x] Backup codes generation
+  - [x] 2FA enforcement at tenant level (optional flag)
 
 ---
 
