@@ -1,28 +1,24 @@
 import Fastify from 'fastify';
-import pino from 'pino';
 import { createDatabaseConnection } from '@mambaPanel/db';
 import { stripeWebhookHandler } from './handlers/stripe';
 import { idempotencyMiddleware } from './middleware/idempotency';
 
-const logger = pino({
-  transport:
-    process.env.NODE_ENV !== 'production'
-      ? {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            singleLine: true,
-          },
-        }
-      : undefined,
-});
-
 async function start() {
-  // Use http1 (not http2) for Stripe webhook compatibility
+  // Fastify defaults to HTTP/1.1 which works correctly with Stripe webhooks
   const fastify = Fastify({
-    logger,
+    logger: {
+      transport:
+        process.env.NODE_ENV !== 'production'
+          ? {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                singleLine: true,
+              },
+            }
+          : undefined,
+    },
     disableRequestLogging: false,
-    http2: false, // Explicitly disable http2 for proper raw body handling
   });
 
   // Initialize database connection
@@ -64,9 +60,9 @@ async function start() {
 
   try {
     await fastify.listen({ port, host });
-    logger.info(`Billing webhooks service listening on ${host}:${port}`);
+    fastify.log.info(`Billing webhooks service listening on ${host}:${port}`);
   } catch (err) {
-    logger.error(err);
+    fastify.log.error(err);
     process.exit(1);
   }
 }
