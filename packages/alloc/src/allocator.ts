@@ -1,6 +1,5 @@
 import type { Database } from '@mambaPanel/db';
-import { portPools, ipPools, allocations } from '@mambaPanel/db';
-import { eq, and } from 'drizzle-orm';
+import { portPools, ipPools, allocations, eq, and } from '@mambaPanel/db';
 
 export interface AllocationResult {
   id: string;
@@ -145,7 +144,7 @@ export class ResourceAllocator {
           nodeId,
           ipAddress,
           ports: allocatedPorts,
-          status: 'active',
+          status: 'allocated',
           allocatedAt: new Date(),
         })
         .returning();
@@ -276,7 +275,7 @@ export class ResourceAllocator {
   > {
     // Find allocations where server no longer exists or is deleted
     const leaks = await this.db.query.allocations.findMany({
-      where: (allocations, { eq }) => eq(allocations.status, 'active'),
+      where: (allocations, { eq }) => eq(allocations.status, 'allocated'),
       with: {
         server: true,
       },

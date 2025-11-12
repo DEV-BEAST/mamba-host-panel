@@ -21,6 +21,13 @@ export const installStatusEnum = pgEnum('install_status', [
   'failed',
 ]);
 
+export const serverLogLevelEnum = pgEnum('server_log_level', [
+  'info',
+  'warning',
+  'error',
+  'success',
+]);
+
 export const servers = pgTable(
   'servers',
   {
@@ -66,5 +73,23 @@ export const servers = pgTable(
     nodeIdIdx: index('servers_node_id_idx').on(table.nodeId),
     statusIdx: index('servers_status_idx').on(table.status),
     userIdIdx: index('servers_user_id_idx').on(table.userId),
+  })
+);
+
+// Server logs table (audit trail for server operations)
+export const serverLogs = pgTable(
+  'server_logs',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    serverId: uuid('server_id')
+      .notNull()
+      .references(() => servers.id, { onDelete: 'cascade' }),
+    level: serverLogLevelEnum('level').notNull(),
+    message: text('message').notNull(),
+    timestamp: timestamp('timestamp', { mode: 'date' }).notNull().defaultNow(),
+  },
+  (table) => ({
+    serverIdIdx: index('server_logs_server_id_idx').on(table.serverId),
+    timestampIdx: index('server_logs_timestamp_idx').on(table.timestamp),
   })
 );

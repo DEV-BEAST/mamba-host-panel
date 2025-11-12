@@ -1,6 +1,27 @@
 import { pgTable, timestamp, uuid, integer, unique, index, real } from 'drizzle-orm/pg-core';
 import { tenants } from './tenants';
 import { nodes } from './nodes';
+import { servers } from './servers';
+
+// Raw metrics samples table (high-frequency data)
+export const metricsSamples = pgTable(
+  'metrics_samples',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    serverId: uuid('server_id')
+      .notNull()
+      .references(() => servers.id, { onDelete: 'cascade' }),
+    cpuUsagePercent: real('cpu_usage_percent').notNull(),
+    memUsageMb: integer('mem_usage_mb').notNull(),
+    diskUsageMb: integer('disk_usage_mb').notNull(),
+    netEgressBytes: integer('net_egress_bytes').notNull().default(0),
+    timestamp: timestamp('timestamp', { mode: 'date' }).notNull().defaultNow(),
+  },
+  (table) => ({
+    serverIdIdx: index('metrics_samples_server_id_idx').on(table.serverId),
+    timestampIdx: index('metrics_samples_timestamp_idx').on(table.timestamp),
+  })
+);
 
 // Metrics hourly table
 export const metricsHourly = pgTable(

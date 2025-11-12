@@ -12,3 +12,4 @@ export function createDatabaseConnection(connectionString: string) {
 }
 
 export type Database = ReturnType<typeof createDatabaseConnection>['db'];
+export type NodeDatabase = Database; // Alias for backwards compatibility

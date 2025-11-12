@@ -19,6 +19,7 @@
     "@mambaPanel/notifications": "workspace:*",
     "@mambaPanel/types": "workspace:*",
     "@nestjs/bull": "^10.1.0",
+    "@nestjs/bullmq": "^10.1.1",
     "@nestjs/common": "^10.3.3",
     "@nestjs/core": "^10.3.3",
     "bull": "^4.12.2",

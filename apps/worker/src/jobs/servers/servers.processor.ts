@@ -3,8 +3,7 @@ import { Logger, Inject } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { InjectDrizzle } from '../../common/database/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
-import { servers, allocations, blueprints, nodes, serverLogs } from '@mambaPanel/db';
-import { eq, and } from 'drizzle-orm';
+import { servers, allocations, blueprints, nodes, serverLogs, eq, and } from '@mambaPanel/db';
 import { ResourceAllocator, RESOURCE_ALLOCATOR } from '@mambaPanel/alloc';
 
 /**
