@@ -47,11 +47,11 @@ export const defaultWorkerOptions: WorkerOptions = {
 
 /**
  * Job-specific options
+ * Note: Timeouts are typically handled via worker lockDuration or job delay, not via JobsOptions
  */
 export const jobOptions: Record<string, Partial<JobsOptions>> = {
   // Server installation can take a long time
   'install-server': {
-    timeout: 10 * 60 * 1000, // 10 minutes
     attempts: 2, // Only retry once
     backoff: {
       type: 'exponential',
@@ -61,21 +61,17 @@ export const jobOptions: Record<string, Partial<JobsOptions>> = {
 
   // Server operations
   'update-server': {
-    timeout: 5 * 60 * 1000, // 5 minutes
     attempts: 3,
   },
   'restart-server': {
-    timeout: 2 * 60 * 1000, // 2 minutes
     attempts: 3,
   },
   'delete-server': {
-    timeout: 5 * 60 * 1000, // 5 minutes
     attempts: 2,
   },
 
   // Backup operations can be slow
   'backup-server': {
-    timeout: 30 * 60 * 1000, // 30 minutes
     attempts: 2,
     backoff: {
       type: 'exponential',
@@ -83,7 +79,6 @@ export const jobOptions: Record<string, Partial<JobsOptions>> = {
     },
   },
   'restore-backup': {
-    timeout: 30 * 60 * 1000, // 30 minutes
     attempts: 2,
     backoff: {
       type: 'exponential',
@@ -93,7 +88,6 @@ export const jobOptions: Record<string, Partial<JobsOptions>> = {
 
   // Metrics jobs
   'aggregate-metrics': {
-    timeout: 5 * 60 * 1000, // 5 minutes
     attempts: 5, // Important for billing, retry more
     backoff: {
       type: 'exponential',
@@ -101,7 +95,6 @@ export const jobOptions: Record<string, Partial<JobsOptions>> = {
     },
   },
   'report-usage': {
-    timeout: 5 * 60 * 1000, // 5 minutes
     attempts: 5, // Important for billing, retry more
     backoff: {
       type: 'exponential',
@@ -111,11 +104,9 @@ export const jobOptions: Record<string, Partial<JobsOptions>> = {
 
   // Notification jobs
   'send-email': {
-    timeout: 30000, // 30 seconds
     attempts: 3,
   },
   'send-discord': {
-    timeout: 10000, // 10 seconds
     attempts: 3,
   },
 };

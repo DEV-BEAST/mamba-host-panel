@@ -1,7 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { InjectDrizzle } from '../../common/database/database.module';
+import { InjectDrizzle } from '../../common/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
 import {
   metricsSamples,
@@ -129,21 +129,42 @@ export class MetricsProcessor extends WorkerHost {
 
       await job.updateProgress(50);
 
-      // Step 3: Insert aggregated data
+      // Step 3: Fetch server info to get tenantId and nodeId
+      const serverInfoMap = new Map<string, { tenantId: string; nodeId: string }>();
+      for (const serverId of aggregatedByServer.keys()) {
+        const [server] = await this.db
+          .select({ tenantId: servers.tenantId, nodeId: servers.nodeId })
+          .from(servers)
+          .where(eq(servers.id, serverId))
+          .limit(1);
+        if (server) {
+          serverInfoMap.set(serverId, server);
+        }
+      }
+
+      // Step 4: Insert aggregated data
       const hourlyRecords = [];
       for (const [serverId, agg] of aggregatedByServer.entries()) {
+        const serverInfo = serverInfoMap.get(serverId);
+        if (!serverInfo) {
+          this.logger.warn(`Server ${serverId} not found, skipping aggregation`);
+          continue;
+        }
+
         const avgCpu = agg.cpuUsages.reduce((a, b) => a + b, 0) / agg.cpuUsages.length;
         const avgMem = agg.memUsages.reduce((a, b) => a + b, 0) / agg.memUsages.length;
         const avgDisk = agg.diskUsages.reduce((a, b) => a + b, 0) / agg.diskUsages.length;
 
         hourlyRecords.push({
           serverId,
-          timestamp: startTime,
-          avgCpuPercent: Math.round(avgCpu * 100) / 100,
-          avgMemMb: Math.round(avgMem),
-          avgDiskMb: Math.round(avgDisk),
-          totalEgressMb: Math.round(agg.netEgressBytes / 1024 / 1024),
-          sampleCount: agg.sampleCount,
+          tenantId: serverInfo.tenantId,
+          nodeId: serverInfo.nodeId,
+          hourTimestamp: startTime,
+          cpuMillicoreAvg: Math.round(avgCpu * 10), // Convert percent to millicores (1% = 10 millicores)
+          memMbAvg: Math.round(avgMem),
+          diskGbUsed: Math.round((avgDisk / 1024) * 100) / 100, // Convert MB to GB
+          egressMbTotal: Math.round(agg.netEgressBytes / 1024 / 1024),
+          samplesCount: agg.sampleCount,
         });
       }
 
@@ -177,7 +198,9 @@ export class MetricsProcessor extends WorkerHost {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to aggregate metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to aggregate metrics: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -253,8 +276,8 @@ export class MetricsProcessor extends WorkerHost {
         .where(
           and(
             sql`${metricsHourly.serverId} = ANY(${serverIds})`,
-            gte(metricsHourly.timestamp, billingPeriodStart),
-            lte(metricsHourly.timestamp, billingPeriodEnd)
+            gte(metricsHourly.hourTimestamp, billingPeriodStart),
+            lte(metricsHourly.hourTimestamp, billingPeriodEnd)
           )
         );
 
@@ -269,9 +292,9 @@ export class MetricsProcessor extends WorkerHost {
 
       for (const metric of metrics) {
         // Each metric is for 1 hour
-        totalCpuHours += metric.avgCpuPercent / 100; // Convert percentage to fractional
-        totalMemGbHours += metric.avgMemMb / 1024; // Convert MB to GB
-        totalEgressGb += metric.totalEgressMb / 1024; // Convert MB to GB
+        totalCpuHours += metric.cpuMillicoreAvg / 1000; // Convert millicores to cores
+        totalMemGbHours += metric.memMbAvg / 1024; // Convert MB to GB
+        totalEgressGb += metric.egressMbTotal / 1024; // Convert MB to GB
       }
 
       // Round to 2 decimal places
@@ -304,15 +327,19 @@ export class MetricsProcessor extends WorkerHost {
       // Step 6: Record usage in database
       const usageRecordIds = [];
 
+      // Note: subscriptionItemId would need to be fetched from subscriptionItems table
+      // For now, using a placeholder - in production, you'd need to map subscription -> subscriptionItem
+      const subscriptionItemId = subscription.id; // TODO: Fetch actual subscriptionItemId
+
       // Create usage record for CPU
       if (totalCpuHours > 0) {
         const [cpuRecord] = await this.db
           .insert(usageRecords)
           .values({
-            subscriptionId: subscription.id,
-            meterId: 'cpu-hours',
-            quantity: totalCpuHours,
-            unit: 'hours',
+            subscriptionItemId,
+            tenantId,
+            metricType: 'cpu_millicore_hours',
+            quantity: Math.round(totalCpuHours * 1000), // Convert to millicores
             periodStart: billingPeriodStart,
             periodEnd: billingPeriodEnd,
             reportedAt: new Date(),
@@ -328,10 +355,10 @@ export class MetricsProcessor extends WorkerHost {
         const [memRecord] = await this.db
           .insert(usageRecords)
           .values({
-            subscriptionId: subscription.id,
-            meterId: 'memory-gb-hours',
-            quantity: totalMemGbHours,
-            unit: 'gb-hours',
+            subscriptionItemId,
+            tenantId,
+            metricType: 'ram_mb_hours',
+            quantity: Math.round(totalMemGbHours * 1024), // Convert to MB
             periodStart: billingPeriodStart,
             periodEnd: billingPeriodEnd,
             reportedAt: new Date(),
@@ -347,10 +374,10 @@ export class MetricsProcessor extends WorkerHost {
         const [egressRecord] = await this.db
           .insert(usageRecords)
           .values({
-            subscriptionId: subscription.id,
-            meterId: 'egress-gb',
-            quantity: totalEgressGb,
-            unit: 'gb',
+            subscriptionItemId,
+            tenantId,
+            metricType: 'egress_gb',
+            quantity: Math.round(totalEgressGb),
             periodStart: billingPeriodStart,
             periodEnd: billingPeriodEnd,
             reportedAt: new Date(),
@@ -381,7 +408,9 @@ export class MetricsProcessor extends WorkerHost {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to report usage for tenant ${tenantId}: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to report usage for tenant ${tenantId}: ${errorMessage}`, errorStack);
       throw error;
     }
   }

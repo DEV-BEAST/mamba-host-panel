@@ -1,7 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger, Inject } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { InjectDrizzle } from '../../common/database/database.module';
+import { InjectDrizzle } from '../../common/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
 import { servers, allocations, blueprints, nodes, serverLogs, eq, and } from '@mambaPanel/db';
 import { ResourceAllocator, RESOURCE_ALLOCATOR } from '@mambaPanel/alloc';
@@ -22,7 +22,7 @@ export interface InstallServerJobData {
   nodeId: string;
   cpuLimitMillicores: number;
   memLimitMb: number;
-  diskLimitMb: number;
+  diskGb: number;
   variables?: Record<string, string>;
 }
 
@@ -30,7 +30,7 @@ export interface UpdateServerJobData {
   serverId: string;
   cpuLimitMillicores?: number;
   memLimitMb?: number;
-  diskLimitMb?: number;
+  diskGb?: number;
   variables?: Record<string, string>;
 }
 
@@ -83,7 +83,7 @@ export class ServersProcessor extends WorkerHost {
   }
 
   private async installServer(job: Job<InstallServerJobData>) {
-    const { serverId, blueprintId, nodeId, cpuLimitMillicores, memLimitMb, diskLimitMb, variables } = job.data;
+    const { serverId, blueprintId, nodeId, cpuLimitMillicores, memLimitMb, diskGb, variables } = job.data;
 
     this.logger.log(`Installing server ${serverId} on node ${nodeId}`);
 
@@ -92,19 +92,13 @@ export class ServersProcessor extends WorkerHost {
       await job.updateProgress(10);
       this.logger.log(`Reserving allocation for server ${serverId}`);
 
-      const allocation = await this.allocator.reserveAllocation(
-        nodeId,
+      const allocation = await this.allocator.allocate(
         serverId,
-        1, // ports needed
-        'tcp',
-        'sequential' // strategy
+        nodeId,
+        [{ protocol: 'tcp', count: 1 }]
       );
 
-      if (!allocation) {
-        throw new Error(`Failed to allocate resources for server ${serverId} on node ${nodeId}`);
-      }
-
-      const portList = allocation.ports.map(p => p.port).join(',');
+      const portList = allocation.ports.map((p: { port: number; protocol: string }) => p.port).join(',');
       this.logger.log(`Allocated ${allocation.ipAddress}:${portList} for server ${serverId}`);
 
       await this.logServerEvent(serverId, 'info', `Allocated ${allocation.ipAddress}:${allocation.ports[0].port}`);
@@ -141,7 +135,7 @@ export class ServersProcessor extends WorkerHost {
         image: blueprint.dockerImage,
         cpu_limit: cpuLimitMillicores,
         memory_limit: memLimitMb,
-        disk_limit: diskLimitMb,
+        disk_limit: diskGb,
         ports: allocation.ports.map(p => ({
           port: p.port,
           protocol: p.protocol,
@@ -211,7 +205,7 @@ export class ServersProcessor extends WorkerHost {
       await this.db
         .update(servers)
         .set({
-          status: 'running',
+          status: 'online',
           installedAt: new Date(),
         })
         .where(eq(servers.id, serverId));
@@ -242,7 +236,7 @@ export class ServersProcessor extends WorkerHost {
 
       // Release allocation if it was created
       try {
-        await this.allocator.releaseAllocation(serverId);
+        await this.allocator.releaseByServer(serverId);
       } catch (releaseError) {
         this.logger.error(`Failed to release allocation for ${serverId}: ${releaseError.message}`);
       }
@@ -252,7 +246,7 @@ export class ServersProcessor extends WorkerHost {
   }
 
   private async updateServer(job: Job<UpdateServerJobData>) {
-    const { serverId, cpuLimitMillicores, memLimitMb, diskLimitMb, variables } = job.data;
+    const { serverId, cpuLimitMillicores, memLimitMb, diskGb, variables } = job.data;
 
     this.logger.log(`Updating server ${serverId}`);
 
@@ -276,7 +270,7 @@ export class ServersProcessor extends WorkerHost {
       const updates: Partial<typeof servers.$inferInsert> = {};
       if (cpuLimitMillicores !== undefined) updates.cpuLimitMillicores = cpuLimitMillicores;
       if (memLimitMb !== undefined) updates.memLimitMb = memLimitMb;
-      if (diskLimitMb !== undefined) updates.diskLimitMb = diskLimitMb;
+      if (diskGb !== undefined) updates.diskGb = diskGb;
 
       await job.updateProgress(30);
 
@@ -364,7 +358,7 @@ export class ServersProcessor extends WorkerHost {
 
       await this.db
         .update(servers)
-        .set({ status: 'stopped' })
+        .set({ status: 'offline' })
         .where(eq(servers.id, serverId));
 
       // Step 2: Start the server
@@ -401,7 +395,7 @@ export class ServersProcessor extends WorkerHost {
 
       await this.db
         .update(servers)
-        .set({ status: 'running' })
+        .set({ status: 'online' })
         .where(eq(servers.id, serverId));
 
       await this.logServerEvent(serverId, 'success', 'Server restarted successfully');
@@ -445,7 +439,7 @@ export class ServersProcessor extends WorkerHost {
       await this.logServerEvent(serverId, 'info', 'Deleting server');
 
       // Step 1: Stop the server if it's running
-      if (server.status === 'running' || server.status === 'starting') {
+      if (server.status === 'online' || server.status === 'starting') {
         await job.updateProgress(20);
         await this.logServerEvent(serverId, 'info', 'Stopping server before deletion');
 
@@ -474,7 +468,7 @@ export class ServersProcessor extends WorkerHost {
       // Step 3: Release allocation
       await this.logServerEvent(serverId, 'info', 'Releasing port allocation');
 
-      await this.allocator.releaseAllocation(serverId);
+      await this.allocator.releaseByServer(serverId);
 
       this.logger.log(`Released allocation for server ${serverId}`);
 
@@ -484,7 +478,7 @@ export class ServersProcessor extends WorkerHost {
       await this.db
         .update(servers)
         .set({
-          status: 'deleted',
+          status: 'failed',
           deletedAt: new Date(),
         })
         .where(eq(servers.id, serverId));

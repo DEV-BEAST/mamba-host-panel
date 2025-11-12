@@ -1,10 +1,9 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { InjectDrizzle } from '../../common/database/database.module';
+import { InjectDrizzle } from '../../common/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
-import { backups, servers, nodes, serverLogs } from '@mambaPanel/db';
-import { eq, and, desc } from 'drizzle-orm';
+import { backups, servers, nodes, serverLogs, eq, and, desc } from '@mambaPanel/db';
 
 /**
  * Backup Job Processor
@@ -90,25 +89,22 @@ export class BackupsProcessor extends WorkerHost {
 
       // Step 3: Create backup record
       await job.updateProgress(10);
-      const backupId = `backup-${serverId}-${Date.now()}`;
-      const backupSizeMb = Math.floor(Math.random() * 500) + 100; // Simulated size
+      const backupSizeBytes = (Math.floor(Math.random() * 500) + 100) * 1024 * 1024; // Simulated size in bytes
 
       const [backup] = await this.db
         .insert(backups)
         .values({
-          id: backupId,
           serverId,
+          tenantId: server.tenantId,
           name: `${type}-backup-${new Date().toISOString()}`,
-          status: 'creating',
-          type,
-          sizeMb: 0, // Will update after backup
-          storagePath: `backups/${serverId}/${backupId}.tar.gz`,
-          createdBy: 'system',
-          retentionDays,
+          status: 'in_progress',
+          backupType: type,
+          sizeBytes: null, // Will update after backup
+          storagePath: `backups/${serverId}/${Date.now()}.tar.gz`,
         })
         .returning();
 
-      this.logger.log(`Created backup record: ${backupId}`);
+      this.logger.log(`Created backup record: ${backup.id}`);
 
       // Step 4: Call Wings API to snapshot volumes
       await job.updateProgress(20);
@@ -127,9 +123,9 @@ export class BackupsProcessor extends WorkerHost {
       await this.logServerEvent(serverId, 'info', 'Compressing backup data');
 
       // TODO: Call Wings API to compress
-      // await wingsClient.compressBackup(serverId, backupId);
+      // await wingsClient.compressBackup(serverId, backup.id);
 
-      this.logger.log(`[SIMULATED] Compressing backup ${backupId}`);
+      this.logger.log(`[SIMULATED] Compressing backup ${backup.id}`);
       await this.sleep(5000);
 
       await job.updateProgress(60);
@@ -139,7 +135,7 @@ export class BackupsProcessor extends WorkerHost {
 
       // TODO: Call object storage API (MinIO/S3)
       // const s3Client = new S3Client();
-      // await s3Client.upload(backupPath, `backups/${serverId}/${backupId}.tar.gz`);
+      // await s3Client.upload(backupPath, backup.storagePath);
 
       this.logger.log(`[SIMULATED] Uploading backup to object storage`);
       await this.sleep(7000);
@@ -151,14 +147,15 @@ export class BackupsProcessor extends WorkerHost {
         .update(backups)
         .set({
           status: 'completed',
-          sizeMb: backupSizeMb,
+          sizeBytes: backupSizeBytes,
           completedAt: new Date(),
         })
-        .where(eq(backups.id, backupId));
+        .where(eq(backups.id, backup.id));
 
+      const backupSizeMb = Math.round(backupSizeBytes / 1024 / 1024);
       await this.logServerEvent(serverId, 'success', `Backup created successfully (${backupSizeMb}MB)`);
 
-      this.logger.log(`Backup ${backupId} completed successfully`);
+      this.logger.log(`Backup ${backup.id} completed successfully`);
 
       await job.updateProgress(90);
 
@@ -169,22 +166,25 @@ export class BackupsProcessor extends WorkerHost {
 
       return {
         success: true,
-        backupId,
-        sizeMb: backupSizeMb,
+        backupId: backup.id,
+        sizeBytes: backupSizeBytes,
         storagePath: backup.storagePath,
       };
     } catch (error) {
-      this.logger.error(`Failed to backup server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Backup failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to backup server ${serverId}: ${errorMessage}`, errorStack);
+      await this.logServerEvent(serverId, 'error', `Backup failed: ${errorMessage}`);
 
       // Mark backup as failed if it was created
       try {
         await this.db
           .update(backups)
           .set({ status: 'failed' })
-          .where(and(eq(backups.serverId, serverId), eq(backups.status, 'creating')));
+          .where(and(eq(backups.serverId, serverId), eq(backups.status, 'in_progress')));
       } catch (updateError) {
-        this.logger.error(`Failed to update backup status: ${updateError.message}`);
+        const updateErrorMessage = updateError instanceof Error ? updateError.message : 'Unknown error';
+        this.logger.error(`Failed to update backup status: ${updateErrorMessage}`);
       }
 
       throw error;
@@ -245,7 +245,7 @@ export class BackupsProcessor extends WorkerHost {
         .limit(1);
 
       // Step 4: Stop server if running
-      if (server.status === 'running') {
+      if (server.status === 'online') {
         await job.updateProgress(10);
         await this.logServerEvent(serverId, 'info', 'Stopping server for restore');
 
@@ -258,7 +258,7 @@ export class BackupsProcessor extends WorkerHost {
 
         await this.db
           .update(servers)
-          .set({ status: 'stopped' })
+          .set({ status: 'offline' })
           .where(eq(servers.id, serverId));
       }
 
@@ -314,17 +314,11 @@ export class BackupsProcessor extends WorkerHost {
 
       await job.updateProgress(95);
 
-      // Step 9: Mark server as running
+      // Step 9: Mark server as online
       await this.db
         .update(servers)
-        .set({ status: 'running' })
+        .set({ status: 'online' })
         .where(eq(servers.id, serverId));
-
-      // Step 10: Update backup restore timestamp
-      await this.db
-        .update(backups)
-        .set({ restoredAt: new Date() })
-        .where(eq(backups.id, backupId));
 
       await this.logServerEvent(serverId, 'success', 'Backup restored successfully');
 
@@ -338,8 +332,10 @@ export class BackupsProcessor extends WorkerHost {
         backupId,
       };
     } catch (error) {
-      this.logger.error(`Failed to restore backup ${backupId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Restore failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to restore backup ${backupId}: ${errorMessage}`, errorStack);
+      await this.logServerEvent(serverId, 'error', `Restore failed: ${errorMessage}`);
 
       // Mark server as failed
       await this.db
@@ -392,12 +388,14 @@ export class BackupsProcessor extends WorkerHost {
         this.logger.log(`[SIMULATED] Deleting backup ${backup.id} from storage`);
 
         // Delete from database
-        await this.db.update(backups).set({ status: 'deleted' }).where(eq(backups.id, backup.id));
+        await this.db.delete(backups).where(eq(backups.id, backup.id));
       }
 
       this.logger.log(`Cleaned up ${backupsToDelete.length} old backups`);
     } catch (error) {
-      this.logger.error(`Failed to cleanup old backups: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to cleanup old backups: ${errorMessage}`, errorStack);
       // Don't throw - cleanup failure shouldn't fail the backup job
     }
   }
@@ -446,7 +444,8 @@ export class BackupsProcessor extends WorkerHost {
         timestamp: new Date(),
       });
     } catch (error) {
-      this.logger.error(`Failed to log server event: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to log server event: ${errorMessage}`);
     }
   }
 
