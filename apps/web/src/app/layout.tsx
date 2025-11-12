@@ -6,7 +6,7 @@ import { Providers } from '@/components/providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'GamePanel - Game Server Management',
+  title: 'Mamba Host Panel - Game Server Management',
   description: 'Modern game server management platform',
 };
 
