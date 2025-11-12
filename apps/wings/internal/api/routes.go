@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/gamepanel/wings/internal/config"
-	"github.com/gamepanel/wings/internal/docker"
+	"github.com/mambapanel/wings/internal/config"
+	"github.com/mambapanel/wings/internal/docker"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go.uber.org/zap"

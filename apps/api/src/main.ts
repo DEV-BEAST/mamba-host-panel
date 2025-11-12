@@ -32,7 +32,7 @@ async function bootstrap() {
 
   // Swagger documentation
   const config = new DocumentBuilder()
-    .setTitle('GamePanel API')
+    .setTitle('Mamba Host Panel API')
     .setDescription('Game server management platform API')
     .setVersion('1.0')
     .addBearerAuth()
