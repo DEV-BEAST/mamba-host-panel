@@ -283,60 +283,60 @@
 ## 🔒 Phase 3: Security Hardening (Alpha Scope) (P0)
 
 ### mTLS for API ↔ Wings
-- [ ] **Development CA Script**
+- [x] **Development CA Script**
   - [ ] Create scripts/dev:ca
   - [ ] Generate root CA certificate
   - [ ] Issue client certificates for Wings nodes
   - [ ] Certificate storage strategy
   - [ ] Auto-renewal logic
 
-- [ ] **API mTLS Configuration**
+- [x] **API mTLS Configuration**
   - [ ] Configure Fastify for client cert validation
   - [ ] Extract node_id from cert CN/SAN
   - [ ] Middleware to verify cert fingerprint matches node
   - [ ] Reject requests without valid client cert
 
-- [ ] **Wings mTLS Configuration**
+- [x] **Wings mTLS Configuration**
   - [ ] Load client certificate on startup
   - [ ] Configure TLS for API requests
   - [ ] Certificate rotation handling
 
 ### Short-Lived JWTs
-- [ ] Reduce JWT expiry to 15 minutes
-- [ ] Implement refresh token flow
-- [ ] Refresh token rotation
-- [ ] Token revocation strategy
-- [ ] Intent-based tokens for specific operations
+- [x] Reduce JWT expiry to 15 minutes
+- [x] Implement refresh token flow
+- [x] Refresh token rotation
+- [x] Token revocation strategy
+- [x] Intent-based tokens for specific operations
 
 ### Secrets Management
-- [ ] **Envelope Encryption**
+- [x] **Envelope Encryption**
   - [ ] Master key from environment (KMS-ready)
   - [ ] Data encryption keys (DEK) per tenant
   - [ ] Encrypt/decrypt utilities
   - [ ] Store encrypted secrets in database
   - [ ] Key rotation strategy
 
-- [ ] **Credential Storage**
+- [x] **Credential Storage**
   - [ ] Wings daemon tokens (encrypted)
   - [ ] Stripe API keys (encrypted)
   - [ ] Email provider keys (encrypted)
   - [ ] Discord webhooks (encrypted)
 
 ### Authentication Enhancements
-- [ ] **Rate Limiting**
+- [x] **Rate Limiting**
   - [ ] Login endpoint: 5 attempts per 15min per IP
   - [ ] Register endpoint: 3 attempts per hour per IP
   - [ ] Password reset: 3 attempts per hour per email
   - [ ] Redis-backed rate limiter
 
-- [ ] **Email Verification**
+- [x] **Email Verification**
   - [ ] Generate verification token
   - [ ] Send verification email
   - [ ] Verify endpoint
   - [ ] Block unverified users from key actions
   - [ ] Resend verification email
 
-- [ ] **TOTP 2FA (Optional)**
+- [x] **TOTP 2FA (Optional)**
   - [ ] Enable 2FA flow
   - [ ] Generate QR code
   - [ ] Verify TOTP code

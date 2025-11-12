@@ -1,5 +1,6 @@
 // Core auth tables
 export * from './users';
+export * from './security';
 
 // Tenancy & RBAC
 export * from './tenants';
