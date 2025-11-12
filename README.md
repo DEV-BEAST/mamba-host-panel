@@ -389,21 +389,67 @@ This project is licensed under the MIT License.
 
 ## 🗺️ Roadmap
 
-### Alpha (In Progress)
+### ✅ Completed Phases
+
+**Phase 0: Foundation** ✅
 - [x] Monorepo foundation with Turborepo
-- [x] RBAC authorization system
-- [x] Atomic port/IP allocation
-- [x] Usage metering and billing integration
-- [x] Background job processing with BullMQ
-- [x] Stripe webhook handling
-- [x] Audit logging system
-- [x] Multi-channel notifications
-- [x] Game server blueprints
-- [ ] Complete database schema
-- [ ] Wings security hardening (mTLS)
-- [ ] Core API endpoints
-- [ ] Web UI screens
-- [ ] Observability stack setup
+- [x] Docker Compose for local development
+- [x] GitHub Actions CI pipeline
+- [x] Base packages (config, types, ui, db, api-contract)
+- [x] Base applications (web, api, wings, worker, billing-webhooks)
+
+**Phase 1: Alpha Core Architecture** ✅
+- [x] RBAC authorization system (packages/authz)
+- [x] Atomic port/IP allocation (packages/alloc)
+- [x] Usage metering SDK (packages/metrics-sdk)
+- [x] Audit logging system (packages/audit)
+- [x] Multi-channel notifications (packages/notifications)
+- [x] Game server blueprints (packages/blueprints)
+
+**Phase 2: Database Schema** ✅
+- [x] Complete database schema (20+ tables)
+- [x] Tenancy and RBAC tables
+- [x] Nodes and allocation tables
+- [x] Servers and blueprints tables
+- [x] Backups and metrics tables
+- [x] Billing and subscription tables
+- [x] Operational tables (audit logs, webhooks, notifications)
+- [x] Comprehensive seed script with demo data
+
+**Phase 3: Security Hardening** ✅
+- [x] mTLS for API ↔ Wings communication
+- [x] Development CA script for certificate generation
+- [x] Short-lived JWTs (15min) with refresh token rotation
+- [x] Envelope encryption for secrets (AES-256-GCM)
+- [x] Redis-backed rate limiting
+- [x] Email verification and password reset
+- [x] Complete authentication service
+
+**Phase 4: Allocator & Job Pipeline** ✅
+- [x] Enhanced allocator with strategies (sequential, random, rotation)
+- [x] Capacity checking and best node selection
+- [x] BullMQ job processors (InstallServer, UpdateServer, RestartServer, DeleteServer)
+- [x] Backup jobs (BackupServer, RestoreBackup)
+- [x] Metrics jobs (AggregateMetrics, ReportUsage)
+- [x] Complete job pipeline with retry and error handling
+
+**Phase 5: Wings Daemon Enhancements** ✅
+- [x] Metrics emitter (collects every 30s, buffers during downtime)
+- [x] Crash guard with exponential backoff auto-restart
+- [x] WebSocket console streaming with multi-client support
+- [x] Complete file manager (list, read, write, compress, extract)
+- [x] RCON adapter for Minecraft (connection pooling)
+- [x] mTLS client integration for secure API communication
+
+### 🚧 In Progress
+
+**Phase 6: API Endpoints** (Next)
+- [ ] Tenant management endpoints
+- [ ] Server management endpoints
+- [ ] Node management endpoints (mTLS)
+- [ ] Metrics endpoints
+- [ ] Billing endpoints
+- [ ] Webhook handlers
 
 ### Beta
 - [ ] Multi-node orchestration

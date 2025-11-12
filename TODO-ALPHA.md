@@ -1225,5 +1225,31 @@ All of the following must be true:
 ---
 
 **Last Updated**: 2025-01-12
-**Version**: 2.0.0 - Alpha Scope
-**Status**: Phase 0 Complete, Phase 1 Starting
+**Version**: 2.0.0 - Alpha Development
+**Status**: Phases 0-5 Complete (Foundation, Architecture, Database, Security, Jobs, Wings), Phase 6 (API Endpoints) Starting
+
+---
+
+## 📊 Progress Summary
+
+### Completed Phases (5/12)
+- ✅ **Phase 0**: Foundation (Turborepo, Docker, CI/CD)
+- ✅ **Phase 1**: Alpha Core Architecture (Packages: authz, alloc, metrics, audit, notifications, blueprints)
+- ✅ **Phase 2**: Database Schema & Migrations (20+ tables, seed data)
+- ✅ **Phase 3**: Security Hardening (mTLS, JWT, encryption, rate limiting)
+- ✅ **Phase 4**: Allocator & Job Pipeline (BullMQ processors, allocation strategies)
+- ✅ **Phase 5**: Wings Daemon Enhancements (metrics, crash guard, console, files, RCON)
+
+### In Progress
+- 🔨 **Phase 6**: API Endpoints (NestJS) - Next up
+
+### Remaining Alpha Scope
+- Phase 7: Web Application UI
+- Phase 8: Usage Metering & Billing Loop
+- Phase 9: Observability (Prometheus, Grafana, Sentry)
+- Phase 10: Legal & Data Export
+- Phase 11: Developer Ergonomics
+- Phase 12: Tests & Acceptance
+
+**Alpha Completion**: 41.7% (5/12 phases complete)
+**Estimated Time to Alpha**: ~12-14 weeks remaining
