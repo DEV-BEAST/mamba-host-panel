@@ -9,19 +9,23 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/seed.ts",
     "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@mambaPanel/types": "workspace:*",
+    "bcrypt": "^5.1.1",
     "drizzle-orm": "^0.30.0",
     "postgres": "^3.4.3"
   },
   "devDependencies": {
     "@mambaPanel/config": "workspace:*",
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.11.19",
     "drizzle-kit": "^0.20.0",
     "eslint": "^8.56.0",
+    "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   }
 }

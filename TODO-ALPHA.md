@@ -120,57 +120,57 @@
 ## 📊 Phase 2: Database Schema & Migrations (P0)
 
 ### Tenancy & RBAC Tables
-- [ ] **tenants table**
+- [x] **tenants table**
   - [ ] id, name, slug, plan_tier, status, created_at, updated_at
   - [ ] Unique constraint on slug
   - [ ] Indexes
 
-- [ ] **tenant_members table**
+- [x] **tenant_members table**
   - [ ] id, tenant_id, user_id, role, invited_by, joined_at
   - [ ] Unique constraint on (tenant_id, user_id)
   - [ ] Foreign keys with cascade
   - [ ] Indexes
 
-- [ ] **roles table**
+- [x] **roles table**
   - [ ] id, name, description, system_role (boolean)
   - [ ] Pre-seed: OWNER, ADMIN, SUPPORT, MEMBER
 
-- [ ] **permissions table**
+- [x] **permissions table**
   - [ ] id, key, resource, action, description
   - [ ] Pre-seed all permission keys
 
-- [ ] **role_permissions table**
+- [x] **role_permissions table**
   - [ ] id, role_id, permission_id
   - [ ] Unique constraint on (role_id, permission_id)
 
-- [ ] **role_bindings table**
+- [x] **role_bindings table**
   - [ ] id, tenant_member_id, role_id
   - [ ] For custom role assignments
 
 ### Nodes & Allocation Tables
-- [ ] **nodes table**
+- [x] **nodes table**
   - [ ] id, name, fqdn, location, capacity_cpu_millicores, capacity_mem_mb, capacity_disk_gb
   - [ ] status, last_heartbeat, cert_fingerprint
   - [ ] created_at, updated_at
   - [ ] Indexes on status, last_heartbeat
 
-- [ ] **ip_pools table**
+- [x] **ip_pools table**
   - [ ] id, node_id, ip_address, is_allocated, allocated_to_server_id
   - [ ] Unique constraint on (node_id, ip_address)
   - [ ] Index on is_allocated
 
-- [ ] **port_pools table**
+- [x] **port_pools table**
   - [ ] id, node_id, port, protocol, is_allocated, allocated_to_server_id
   - [ ] Unique constraint on (node_id, port, protocol)
   - [ ] Index on is_allocated
 
-- [ ] **allocations table**
+- [x] **allocations table**
   - [ ] id, server_id, node_id, ip_address, ports (jsonb)
   - [ ] status, allocated_at, released_at
   - [ ] Unique constraint on server_id
 
 ### Servers & Blueprints Tables
-- [ ] **Extend servers table**
+- [x] **Extend servers table**
   - [ ] Add tenant_id (foreign key)
   - [ ] Add node_id (foreign key)
   - [ ] Add allocation_id (foreign key)
@@ -179,7 +179,7 @@
   - [ ] Add install_status, install_log
   - [ ] Indexes on tenant_id, node_id, status
 
-- [ ] **blueprints table**
+- [x] **blueprints table**
   - [ ] id, game_slug, name, version, docker_image
   - [ ] startup_command, config_files (jsonb), variables (jsonb)
   - [ ] install_script, requires_allocation
@@ -187,13 +187,13 @@
   - [ ] Index on game_slug
 
 ### Backups & Metrics Tables
-- [ ] **backups table**
+- [x] **backups table**
   - [ ] id, server_id, tenant_id, name, size_bytes
   - [ ] status, storage_path, backup_type
   - [ ] created_at, completed_at, expires_at
   - [ ] Indexes on server_id, tenant_id, status
 
-- [ ] **metrics_hourly table**
+- [x] **metrics_hourly table**
   - [ ] id, server_id, tenant_id, node_id
   - [ ] hour_timestamp, cpu_millicore_avg, mem_mb_avg
   - [ ] disk_gb_used, egress_mb_total
@@ -202,54 +202,54 @@
   - [ ] Indexes on tenant_id, hour_timestamp
 
 ### Billing Tables
-- [ ] **products table**
+- [x] **products table**
   - [ ] id, stripe_product_id, name, description
   - [ ] active, created_at, updated_at
 
-- [ ] **prices table**
+- [x] **prices table**
   - [ ] id, product_id, stripe_price_id, amount, currency
   - [ ] billing_period, metered, usage_type
   - [ ] active, created_at, updated_at
 
-- [ ] **subscriptions table**
+- [x] **subscriptions table**
   - [ ] id, tenant_id, stripe_subscription_id, stripe_customer_id
   - [ ] status, current_period_start, current_period_end
   - [ ] cancel_at, canceled_at
   - [ ] created_at, updated_at
   - [ ] Index on tenant_id, status
 
-- [ ] **subscription_items table**
+- [x] **subscription_items table**
   - [ ] id, subscription_id, stripe_subscription_item_id
   - [ ] price_id, quantity
   - [ ] created_at, updated_at
 
-- [ ] **usage_records table**
+- [x] **usage_records table**
   - [ ] id, subscription_item_id, tenant_id, server_id
   - [ ] metric_type, quantity, period_start, period_end
   - [ ] stripe_usage_record_id, reported_at
   - [ ] Indexes on tenant_id, period_start
 
-- [ ] **invoices table**
+- [x] **invoices table**
   - [ ] id, tenant_id, subscription_id, stripe_invoice_id
   - [ ] amount_due, amount_paid, currency, status
   - [ ] invoice_pdf, hosted_invoice_url
   - [ ] created_at, due_date, paid_at
   - [ ] Index on tenant_id
 
-- [ ] **credits table**
+- [x] **credits table**
   - [ ] id, tenant_id, amount, currency, description
   - [ ] expires_at, used_at
   - [ ] created_at
 
 ### Operational Tables
-- [ ] **audit_logs table**
+- [x] **audit_logs table**
   - [ ] id, tenant_id, actor_id, actor_type
   - [ ] action, resource_type, resource_id
   - [ ] metadata (jsonb), ip_address, user_agent
   - [ ] created_at
   - [ ] Indexes on tenant_id, created_at, actor_id
 
-- [ ] **webhook_events table**
+- [x] **webhook_events table**
   - [ ] id, provider, event_type, event_id
   - [ ] payload (jsonb), processed, processed_at
   - [ ] retry_count, last_error
@@ -257,7 +257,7 @@
   - [ ] Unique constraint on (provider, event_id)
   - [ ] Index on processed
 
-- [ ] **notifications table**
+- [x] **notifications table**
   - [ ] id, tenant_id, user_id, channel, template
   - [ ] subject, body, metadata (jsonb)
   - [ ] status, sent_at, read_at
@@ -265,8 +265,8 @@
   - [ ] Indexes on user_id, status
 
 ### Migrations & Seeds
-- [ ] Generate Drizzle migration
-- [ ] Create seed script for demo data:
+- [x] Generate Drizzle migration
+- [x] Create seed script for demo data:
   - [ ] 1 demo tenant ("Demo Corp")
   - [ ] 2 users (owner, member)
   - [ ] 2 nodes (us-east-1, us-west-1)
@@ -276,7 +276,7 @@
   - [ ] Sample hourly metrics (24h)
   - [ ] 1 backup
   - [ ] Audit log entries
-- [ ] Document tenant filtering strategy
+- [x] Document tenant filtering strategy
 
 ---
 
