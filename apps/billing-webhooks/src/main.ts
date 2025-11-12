@@ -18,9 +18,11 @@ const logger = pino({
 });
 
 async function start() {
+  // Use http1 (not http2) for Stripe webhook compatibility
   const fastify = Fastify({
     logger,
     disableRequestLogging: false,
+    http2: false, // Explicitly disable http2 for proper raw body handling
   });
 
   // Initialize database connection
@@ -29,6 +31,16 @@ async function start() {
     throw new Error('DATABASE_URL is not defined');
   }
   const { db } = createDatabaseConnection(databaseUrl);
+
+  // Add raw body parser for Stripe webhooks
+  // Stripe needs the raw body for signature verification
+  fastify.addContentTypeParser(
+    'application/json',
+    { parseAs: 'string' },
+    (req, body, done) => {
+      done(null, body);
+    }
+  );
 
   // Health check
   fastify.get('/health', async () => {
