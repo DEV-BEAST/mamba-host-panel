@@ -99,6 +99,103 @@ services:
     working_dir: /app
     command: make dev
 
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    container_name: gamepanel-worker
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/gamepanel
+      REDIS_URL: redis://redis:6379
+      WINGS_API_URL: http://wings:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./apps/worker:/app/apps/worker
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/worker/node_modules
+    command: pnpm --filter @gamePanel/worker dev
+
+  billing-webhooks:
+    build:
+      context: .
+      dockerfile: apps/billing-webhooks/Dockerfile
+    container_name: gamepanel-billing-webhooks
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/gamepanel
+      STRIPE_SECRET_KEY: sk_test_change_in_production
+      STRIPE_WEBHOOK_SECRET: whsec_change_in_production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./apps/billing-webhooks:/app/apps/billing-webhooks
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/billing-webhooks/node_modules
+    command: pnpm --filter @gamePanel/billing-webhooks dev
+
+  minio:
+    image: minio/minio:latest
+    container_name: gamepanel-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gamepanel-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./tools/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gamepanel-grafana
+    ports:
+      - "3003:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./tools/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+
 volumes:
   postgres_data:
   redis_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:

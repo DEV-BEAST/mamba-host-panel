@@ -4,21 +4,32 @@ A full-stack game server management platform built with modern technologies. Sim
 
 ## 🏗️ Architecture
 
-This is a monorepo containing three main applications and several shared packages:
+This is a monorepo containing five main applications and multiple shared packages:
 
 ### Applications
 
 - **Web Panel** (`apps/web`) - Next.js 15 frontend with App Router
 - **API Backend** (`apps/api`) - NestJS API with Fastify adapter
 - **Wings Daemon** (`apps/wings`) - Go service for managing Docker containers
+- **Worker** (`apps/worker`) - NestJS + BullMQ background job processor
+- **Billing Webhooks** (`apps/billing-webhooks`) - Fastify service for Stripe webhook handling
 
 ### Shared Packages
 
+#### Core Packages
 - **`packages/types`** - Shared TypeScript types
 - **`packages/ui`** - shadcn/ui component library
 - **`packages/db`** - Drizzle ORM schema and migrations
 - **`packages/config`** - Shared ESLint and TypeScript configurations
 - **`packages/api-contract`** - OpenAPI specification for Wings API
+
+#### Business Logic Packages
+- **`packages/authz`** - RBAC authorization system with permissions and roles
+- **`packages/alloc`** - Atomic port/IP allocator with Postgres locking
+- **`packages/metrics-sdk`** - Usage tracking types and aggregation for billing
+- **`packages/audit`** - Append-only audit logging system
+- **`packages/notifications`** - Multi-channel notifications (email, Discord, web push)
+- **`packages/blueprints`** - Game server templates with validation
 
 ## 🛠️ Tech Stack
 
@@ -48,6 +59,12 @@ This is a monorepo containing three main applications and several shared package
 - Docker SDK for Go
 - Zap structured logging
 - OpenAPI client
+
+### Infrastructure
+- MinIO (S3-compatible object storage)
+- Prometheus (metrics collection)
+- Grafana (metrics visualization)
+- Stripe (payments and billing)
 
 ### DevOps
 - Turborepo for build orchestration
@@ -135,25 +152,40 @@ make dev
 - **API**: http://localhost:3001
 - **API Documentation**: http://localhost:3001/api-docs
 - **Wings**: http://localhost:8080
+- **Billing Webhooks**: http://localhost:3002
+- **MinIO Console**: http://localhost:9001 (credentials: minioadmin/minioadmin)
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3003 (credentials: admin/admin)
 
 ## 📁 Project Structure
 
 ```
-game-panel/
+mamba-host-panel/
 ├── apps/
-│   ├── web/              # Next.js frontend
-│   ├── api/              # NestJS backend
-│   └── wings/            # Go daemon
+│   ├── web/                  # Next.js frontend
+│   ├── api/                  # NestJS backend
+│   ├── wings/                # Go daemon
+│   ├── worker/               # BullMQ job processor
+│   └── billing-webhooks/     # Stripe webhook handler
 ├── packages/
-│   ├── types/            # Shared TypeScript types
-│   ├── ui/               # UI component library
-│   ├── db/               # Database schema
-│   ├── config/           # Shared configs
-│   └── api-contract/     # OpenAPI spec
+│   ├── types/                # Shared TypeScript types
+│   ├── ui/                   # UI component library
+│   ├── db/                   # Database schema & migrations
+│   ├── config/               # ESLint & TypeScript configs
+│   ├── api-contract/         # OpenAPI spec
+│   ├── authz/                # RBAC authorization
+│   ├── alloc/                # Port/IP allocator
+│   ├── metrics-sdk/          # Usage tracking
+│   ├── audit/                # Audit logging
+│   ├── notifications/        # Multi-channel notifications
+│   └── blueprints/           # Game server templates
+├── tools/
+│   ├── prometheus/           # Prometheus config
+│   └── grafana/              # Grafana dashboards
 ├── .github/
-│   └── workflows/        # CI/CD workflows
-├── docker-compose.yml    # Docker Compose config
-└── turbo.json           # Turborepo config
+│   └── workflows/            # CI/CD workflows
+├── docker-compose.yml        # Docker Compose config
+└── turbo.json               # Turborepo config
 ```
 
 ## 🧪 Development
@@ -357,16 +389,30 @@ This project is licensed under the MIT License.
 
 ## 🗺️ Roadmap
 
-- [ ] User management and permissions
-- [ ] Server templates and eggs
-- [ ] Resource allocation and limits
-- [ ] Billing integration (Stripe)
-- [ ] Multi-node support
+### Alpha (In Progress)
+- [x] Monorepo foundation with Turborepo
+- [x] RBAC authorization system
+- [x] Atomic port/IP allocation
+- [x] Usage metering and billing integration
+- [x] Background job processing with BullMQ
+- [x] Stripe webhook handling
+- [x] Audit logging system
+- [x] Multi-channel notifications
+- [x] Game server blueprints
+- [ ] Complete database schema
+- [ ] Wings security hardening (mTLS)
+- [ ] Core API endpoints
+- [ ] Web UI screens
+- [ ] Observability stack setup
+
+### Beta
+- [ ] Multi-node orchestration
+- [ ] Advanced resource management
 - [ ] Server backups and snapshots
-- [ ] File manager
+- [ ] File manager with SFTP
 - [ ] Schedule and task automation
-- [ ] Metrics and monitoring
-- [ ] Audit logging
+- [ ] Advanced billing features
+- [ ] User dashboard and analytics
 
 ---
 

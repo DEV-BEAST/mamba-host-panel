@@ -1,0 +1,21 @@
+{
+  "name": "@gamePanel/blueprints",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gamePanel/types": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@gamePanel/config": "workspace:*",
+    "@types/node": "^20.11.19",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  }
+}
