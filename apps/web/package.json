@@ -1,5 +1,5 @@
 {
-  "name": "@gamePanel/web",
+  "name": "@mambaPanel/web",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gamePanel/types": "workspace:*",
-    "@gamePanel/ui": "workspace:*",
+    "@mambaPanel/types": "workspace:*",
+    "@mambaPanel/ui": "workspace:*",
     "@tanstack/react-query": "^5.22.2",
     "@trpc/client": "^11.0.0-rc.330",
     "@trpc/react-query": "^11.0.0-rc.330",
@@ -24,7 +24,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@gamePanel/config": "workspace:*",
+    "@mambaPanel/config": "workspace:*",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
