@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nes
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WingsService } from './wings.service';
-import type { CreateWingsNodeInput, UpdateWingsNodeInput } from '@gamePanel/types';
+import type { CreateWingsNodeInput, UpdateWingsNodeInput } from '@mambaPanel/types';
 
 @ApiTags('wings')
 @Controller('wings')

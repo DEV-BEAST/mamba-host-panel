@@ -1,5 +1,5 @@
-import type { Database } from '@gamePanel/db';
-import { portPools, ipPools, allocations } from '@gamePanel/db';
+import type { Database } from '@mambaPanel/db';
+import { portPools, ipPools, allocations } from '@mambaPanel/db';
 import { eq, and } from 'drizzle-orm';
 
 export interface AllocationResult {

@@ -1,5 +1,5 @@
 {
-  "extends": "@gamePanel/config/typescript/base.json",
+  "extends": "@mambaPanel/config/typescript/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],

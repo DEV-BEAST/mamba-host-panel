@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import type { Database } from '@gamePanel/db';
-import { webhookEvents, subscriptions, invoices } from '@gamePanel/db';
+import type { Database } from '@mambaPanel/db';
+import { webhookEvents, subscriptions, invoices } from '@mambaPanel/db';
 import { eq } from 'drizzle-orm';
 import Stripe from 'stripe';
 

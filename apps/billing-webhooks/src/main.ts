@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import pino from 'pino';
-import { createDatabaseConnection } from '@gamePanel/db';
+import { createDatabaseConnection } from '@mambaPanel/db';
 import { stripeWebhookHandler } from './handlers/stripe';
 import { idempotencyMiddleware } from './middleware/idempotency';
 

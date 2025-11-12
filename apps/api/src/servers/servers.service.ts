@@ -1,9 +1,9 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../common/database/database.module';
-import { servers } from '@gamePanel/db';
+import { servers } from '@mambaPanel/db';
 import { eq } from 'drizzle-orm';
-import type { Database } from '@gamePanel/db';
-import type { CreateServerInput, UpdateServerInput } from '@gamePanel/types';
+import type { Database } from '@mambaPanel/db';
+import type { CreateServerInput, UpdateServerInput } from '@mambaPanel/types';
 
 @Injectable()
 export class ServersService {

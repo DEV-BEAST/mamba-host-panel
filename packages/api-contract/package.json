@@ -1,5 +1,5 @@
 {
-  "name": "@gamePanel/api-contract",
+  "name": "@mambaPanel/api-contract",
   "version": "1.0.0",
   "private": true,
   "main": "openapi.yaml",

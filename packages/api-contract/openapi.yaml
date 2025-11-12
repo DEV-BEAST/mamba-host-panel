@@ -4,7 +4,7 @@ info:
   description: API specification for the Wings daemon that manages game server containers
   version: 1.0.0
   contact:
-    name: GamePanel
+    name: Mamba Host Panel
 servers:
   - url: http://localhost:8080
     description: Local development server

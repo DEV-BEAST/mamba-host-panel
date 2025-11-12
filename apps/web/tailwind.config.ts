@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss';
-import uiConfig from '@gamePanel/ui/tailwind.config';
+import uiConfig from '@mambaPanel/ui/tailwind.config';
 
 const config: Config = {
   ...uiConfig,

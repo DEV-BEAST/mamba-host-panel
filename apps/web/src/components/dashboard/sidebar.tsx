@@ -4,7 +4,7 @@ export function Sidebar() {
   return (
     <aside className="w-64 border-r bg-muted/40 p-6">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold">GamePanel</h2>
+        <h2 className="text-2xl font-bold">Mamba Host Panel</h2>
       </div>
       <nav className="space-y-2">
         <Link

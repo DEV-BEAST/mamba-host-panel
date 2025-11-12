@@ -1,5 +1,5 @@
 {
-  "extends": "@gamePanel/config/typescript/nextjs.json",
+  "extends": "@mambaPanel/config/typescript/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

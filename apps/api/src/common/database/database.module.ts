@@ -1,6 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createDatabaseConnection } from '@gamePanel/db';
+import { createDatabaseConnection } from '@mambaPanel/db';
 
 export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
 

@@ -12,7 +12,7 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ServersService } from './servers.service';
-import type { CreateServerInput, UpdateServerInput } from '@gamePanel/types';
+import type { CreateServerInput, UpdateServerInput } from '@mambaPanel/types';
 
 @ApiTags('servers')
 @Controller('servers')

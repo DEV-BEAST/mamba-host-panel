@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { Button } from '@gamePanel/ui';
+import { Button } from '@mambaPanel/ui';
 
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="text-center">
-        <h1 className="mb-6 text-6xl font-bold">GamePanel</h1>
+        <h1 className="mb-6 text-6xl font-bold">Mamba Host Panel</h1>
         <p className="mb-8 text-xl text-muted-foreground">
           Modern game server management platform
         </p>

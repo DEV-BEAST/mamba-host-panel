@@ -1,4 +1,4 @@
-# GamePanel - Modern Game Server Management Platform
+# Mamba Host Panel - Modern Game Server Management Platform
 
 A full-stack game server management platform built with modern technologies. Similar to Pterodactyl but with a modernized stack.
 
@@ -88,7 +88,7 @@ This is a monorepo containing five main applications and multiple shared package
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd game-panel
+cd mamba-host-panel
 
 # Install dependencies
 pnpm install
@@ -111,10 +111,10 @@ cp .env.example .env
 docker-compose up -d postgres redis
 
 # Generate Drizzle migrations
-pnpm --filter @gamePanel/db db:generate
+pnpm --filter @mambaPanel/db db:generate
 
 # Run migrations
-pnpm --filter @gamePanel/db db:migrate
+pnpm --filter @mambaPanel/db db:migrate
 ```
 
 ### 4. Start Development Servers
@@ -136,10 +136,10 @@ docker-compose logs -f
 
 ```bash
 # Terminal 1: Start API
-pnpm --filter @gamePanel/api dev
+pnpm --filter @mambaPanel/api dev
 
 # Terminal 2: Start Web
-pnpm --filter @gamePanel/web dev
+pnpm --filter @mambaPanel/web dev
 
 # Terminal 3: Start Wings (requires Go)
 cd apps/wings
@@ -223,8 +223,8 @@ pnpm format
 pnpm build
 
 # Build specific package
-pnpm --filter @gamePanel/web build
-pnpm --filter @gamePanel/api build
+pnpm --filter @mambaPanel/web build
+pnpm --filter @mambaPanel/api build
 
 # Build Wings
 cd apps/wings
@@ -237,20 +237,20 @@ make build
 
 ```bash
 # Open Drizzle Studio (database GUI)
-pnpm --filter @gamePanel/db db:studio
+pnpm --filter @mambaPanel/db db:studio
 ```
 
 ### Migrations
 
 ```bash
 # Generate migration from schema changes
-pnpm --filter @gamePanel/db db:generate
+pnpm --filter @mambaPanel/db db:generate
 
 # Run migrations
-pnpm --filter @gamePanel/db db:migrate
+pnpm --filter @mambaPanel/db db:migrate
 
 # Push schema directly (development only)
-pnpm --filter @gamePanel/db db:push
+pnpm --filter @mambaPanel/db db:push
 ```
 
 ## 🔐 Authentication
@@ -297,7 +297,7 @@ Key environment variables to configure:
 
 ```env
 # Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/gamepanel
+DATABASE_URL=postgresql://user:pass@localhost:5432/mambapanel
 
 # Redis
 REDIS_URL=redis://localhost:6379
@@ -416,4 +416,4 @@ This project is licensed under the MIT License.
 
 ---
 
-Built with ❤️ by the GamePanel team
+Built with ❤️ by the Mamba Host Panel team

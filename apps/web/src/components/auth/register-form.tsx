@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Input, Label } from '@gamePanel/ui';
+import { Button, Input, Label } from '@mambaPanel/ui';
 
 export function RegisterForm() {
   return (

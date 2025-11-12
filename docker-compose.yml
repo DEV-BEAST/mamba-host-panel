@@ -3,11 +3,11 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: gamepanel-postgres
+    container_name: mambapanel-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: gamepanel
+      POSTGRES_DB: mambapanel
     ports:
       - "5432:5432"
     volumes:
@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: gamepanel-redis
+    container_name: mambapanel-redis
     ports:
       - "6379:6379"
     volumes:
@@ -35,13 +35,13 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    container_name: gamepanel-api
+    container_name: mambapanel-api
     ports:
       - "3001:3001"
     environment:
       NODE_ENV: development
       PORT: 3001
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/gamepanel
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/mambapanel
       REDIS_URL: redis://redis:6379
       JWT_SECRET: dev-secret-change-in-production
       WEB_URL: http://localhost:3000
@@ -55,13 +55,13 @@ services:
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/api/node_modules
-    command: pnpm --filter @gamePanel/api dev
+    command: pnpm --filter @mambaPanel/api dev
 
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-    container_name: gamepanel-web
+    container_name: mambapanel-web
     ports:
       - "3000:3000"
     environment:
@@ -77,13 +77,13 @@ services:
       - /app/node_modules
       - /app/apps/web/node_modules
       - /app/apps/web/.next
-    command: pnpm --filter @gamePanel/web dev
+    command: pnpm --filter @mambaPanel/web dev
 
   wings:
     build:
       context: .
       dockerfile: apps/wings/Dockerfile
-    container_name: gamepanel-wings
+    container_name: mambapanel-wings
     ports:
       - "8080:8080"
     environment:
@@ -103,10 +103,10 @@ services:
     build:
       context: .
       dockerfile: apps/worker/Dockerfile
-    container_name: gamepanel-worker
+    container_name: mambapanel-worker
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/gamepanel
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/mambapanel
       REDIS_URL: redis://redis:6379
       WINGS_API_URL: http://wings:8080
     depends_on:
@@ -119,20 +119,20 @@ services:
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/worker/node_modules
-    command: pnpm --filter @gamePanel/worker dev
+    command: pnpm --filter @mambaPanel/worker dev
 
   billing-webhooks:
     build:
       context: .
       dockerfile: apps/billing-webhooks/Dockerfile
-    container_name: gamepanel-billing-webhooks
+    container_name: mambapanel-billing-webhooks
     ports:
       - "3002:3002"
     environment:
       NODE_ENV: development
       PORT: 3002
       HOST: 0.0.0.0
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/gamepanel
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/mambapanel
       STRIPE_SECRET_KEY: sk_test_change_in_production
       STRIPE_WEBHOOK_SECRET: whsec_change_in_production
     depends_on:
@@ -143,11 +143,11 @@ services:
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/billing-webhooks/node_modules
-    command: pnpm --filter @gamePanel/billing-webhooks dev
+    command: pnpm --filter @mambaPanel/billing-webhooks dev
 
   minio:
     image: minio/minio:latest
-    container_name: gamepanel-minio
+    container_name: mambapanel-minio
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -165,7 +165,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: gamepanel-prometheus
+    container_name: mambapanel-prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -180,7 +180,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: gamepanel-grafana
+    container_name: mambapanel-grafana
     ports:
       - "3003:3000"
     environment:

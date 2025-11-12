@@ -1,5 +1,5 @@
 {
-  "name": "@gamePanel/authz",
+  "name": "@mambaPanel/authz",
   "version": "1.0.0",
   "private": true,
   "main": "./src/index.ts",
@@ -14,10 +14,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gamePanel/types": "workspace:*"
+    "@mambaPanel/types": "workspace:*"
   },
   "devDependencies": {
-    "@gamePanel/config": "workspace:*",
+    "@mambaPanel/config": "workspace:*",
     "@nestjs/common": "^10.3.3",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.55",

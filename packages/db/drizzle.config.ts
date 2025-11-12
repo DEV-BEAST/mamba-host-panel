@@ -5,7 +5,7 @@ export default defineConfig({
   out: './src/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/gamepanel',
+    url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/mambapanel',
   },
   verbose: true,
   strict: true,

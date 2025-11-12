@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gamepanel/wings/internal/api"
-	"github.com/gamepanel/wings/internal/config"
-	"github.com/gamepanel/wings/internal/docker"
+	"github.com/mambapanel/wings/internal/api"
+	"github.com/mambapanel/wings/internal/config"
+	"github.com/mambapanel/wings/internal/docker"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )

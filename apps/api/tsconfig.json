@@ -1,5 +1,5 @@
 {
-  "extends": "@gamePanel/config/typescript/nest.json",
+  "extends": "@mambaPanel/config/typescript/nest.json",
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {

@@ -1,5 +1,5 @@
 {
-  "name": "@gamePanel/db",
+  "name": "@mambaPanel/db",
   "version": "1.0.0",
   "private": true,
   "main": "./src/index.ts",
@@ -13,12 +13,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gamePanel/types": "workspace:*",
+    "@mambaPanel/types": "workspace:*",
     "drizzle-orm": "^0.30.0",
     "postgres": "^3.4.3"
   },
   "devDependencies": {
-    "@gamePanel/config": "workspace:*",
+    "@mambaPanel/config": "workspace:*",
     "@types/node": "^20.11.19",
     "drizzle-kit": "^0.20.0",
     "eslint": "^8.56.0",

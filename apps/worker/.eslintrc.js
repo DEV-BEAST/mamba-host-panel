@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  extends: ['@gamePanel/config/eslint/nest.js'],
+  extends: ['@mambaPanel/config/eslint/nest.js'],
 };

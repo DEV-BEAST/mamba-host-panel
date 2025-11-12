@@ -1,5 +1,5 @@
-import type { Database } from '@gamePanel/db';
-import { auditLogs } from '@gamePanel/db';
+import type { Database } from '@mambaPanel/db';
+import { auditLogs } from '@mambaPanel/db';
 import type { AuditLogEntry } from './types';
 
 /**

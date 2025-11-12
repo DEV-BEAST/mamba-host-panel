@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@gamePanel/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@mambaPanel/ui';
 import { LoginForm } from '@/components/auth/login-form';
 
 export default function LoginPage() {

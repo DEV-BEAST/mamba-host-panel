@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  extends: ['@gamePanel/config/eslint/library.js'],
+  extends: ['@mambaPanel/config/eslint/library.js'],
 };

@@ -1,4 +1,4 @@
-# GamePanel Development Roadmap
+# Mamba Host Panel Development Roadmap
 
 A comprehensive checklist tracking progress from initial scaffold to production-ready game server control panel (similar to Pterodactyl/Wisp).
 

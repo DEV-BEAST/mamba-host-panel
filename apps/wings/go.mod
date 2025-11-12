@@ -1,4 +1,4 @@
-module github.com/gamepanel/wings
+module github.com/mambapanel/wings
 
 go 1.22
 

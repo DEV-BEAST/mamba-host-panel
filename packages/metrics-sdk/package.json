@@ -1,5 +1,5 @@
 {
-  "name": "@gamePanel/metrics-sdk",
+  "name": "@mambaPanel/metrics-sdk",
   "version": "1.0.0",
   "private": true,
   "main": "./src/index.ts",
@@ -9,11 +9,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gamePanel/types": "workspace:*",
+    "@mambaPanel/types": "workspace:*",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@gamePanel/config": "workspace:*",
+    "@mambaPanel/config": "workspace:*",
     "@types/node": "^20.11.19",
     "eslint": "^8.56.0",
     "typescript": "^5.3.3"
