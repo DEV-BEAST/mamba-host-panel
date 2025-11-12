@@ -136,13 +136,13 @@ export class ServersProcessor extends WorkerHost {
         cpu_limit: cpuLimitMillicores,
         memory_limit: memLimitMb,
         disk_limit: diskGb,
-        ports: allocation.ports.map(p => ({
+        ports: allocation.ports.map((p: { port: number; protocol: string }) => ({
           port: p.port,
           protocol: p.protocol,
         })),
         ip_address: allocation.ipAddress,
         environment: {
-          ...blueprint.defaultVariables,
+          ...(blueprint.variables as Record<string, any> || {}),
           ...variables,
         },
         startup_command: blueprint.startupCommand,
@@ -206,7 +206,6 @@ export class ServersProcessor extends WorkerHost {
         .update(servers)
         .set({
           status: 'online',
-          installedAt: new Date(),
         })
         .where(eq(servers.id, serverId));
 
@@ -225,8 +224,8 @@ export class ServersProcessor extends WorkerHost {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to install server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Installation failed: ${error.message}`);
+      this.logger.error(`Failed to install server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Installation failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
 
       // Mark server as failed
       await this.db
@@ -238,7 +237,7 @@ export class ServersProcessor extends WorkerHost {
       try {
         await this.allocator.releaseByServer(serverId);
       } catch (releaseError) {
-        this.logger.error(`Failed to release allocation for ${serverId}: ${releaseError.message}`);
+        this.logger.error(`Failed to release allocation for ${serverId}: ${(releaseError instanceof Error ? releaseError.message : "Unknown error")}`);
       }
 
       throw error;
@@ -313,8 +312,8 @@ export class ServersProcessor extends WorkerHost {
 
       return { success: true, serverId };
     } catch (error) {
-      this.logger.error(`Failed to update server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Update failed: ${error.message}`);
+      this.logger.error(`Failed to update server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Update failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
       throw error;
     }
   }
@@ -406,8 +405,8 @@ export class ServersProcessor extends WorkerHost {
 
       return { success: true, serverId };
     } catch (error) {
-      this.logger.error(`Failed to restart server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Restart failed: ${error.message}`);
+      this.logger.error(`Failed to restart server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Restart failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
 
       await this.db
         .update(servers)
@@ -479,7 +478,6 @@ export class ServersProcessor extends WorkerHost {
         .update(servers)
         .set({
           status: 'failed',
-          deletedAt: new Date(),
         })
         .where(eq(servers.id, serverId));
 
@@ -491,8 +489,8 @@ export class ServersProcessor extends WorkerHost {
 
       return { success: true, serverId };
     } catch (error) {
-      this.logger.error(`Failed to delete server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Deletion failed: ${error.message}`);
+      this.logger.error(`Failed to delete server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Deletion failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
       throw error;
     }
   }
@@ -542,7 +540,7 @@ export class ServersProcessor extends WorkerHost {
         timestamp: new Date(),
       });
     } catch (error) {
-      this.logger.error(`Failed to log server event: ${error.message}`);
+      this.logger.error(`Failed to log server event: ${(error instanceof Error ? error.message : "Unknown error")}`);
     }
   }
 

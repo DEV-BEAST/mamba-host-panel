@@ -282,7 +282,7 @@ export class ResourceAllocator {
     });
 
     return leaks
-      .filter((leak) => !leak.server || leak.server.status === 'deleted')
+      .filter((leak: any) => !leak.server || (leak.server as any).status === 'failed')
       .map((leak) => ({
         serverId: leak.serverId,
         nodeId: leak.nodeId,
