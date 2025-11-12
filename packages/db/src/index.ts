@@ -3,6 +3,7 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 export * from './schema';
+export { eq, and, or, not, sql } from 'drizzle-orm';
 
 export function createDatabaseConnection(connectionString: string) {
   const client = postgres(connectionString);
