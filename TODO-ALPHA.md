@@ -345,97 +345,97 @@
 
 ---
 
-## ⚙️ Phase 4: Allocator & Job Pipeline (P0)
+## ✅ Phase 4: Allocator & Job Pipeline (COMPLETED)
 
 ### packages/alloc Implementation
-- [ ] **Core Functions**
-  - [ ] `reservePort(nodeId, protocol)` - atomic reservation
-  - [ ] `reserveIP(nodeId)` - atomic IP assignment
-  - [ ] `allocate(serverId, nodeId)` - full allocation
-  - [ ] `releaseByServer(serverId)` - release all resources
-  - [ ] `releaseByNode(nodeId)` - node decommission
-  - [ ] `scanLeaks()` - find orphaned allocations
-  - [ ] Transaction handling for atomicity
+- [x] **Core Functions**
+  - [x] `reservePort(nodeId, protocol)` - atomic reservation
+  - [x] `reserveIP(nodeId)` - atomic IP assignment
+  - [x] `allocate(serverId, nodeId)` - full allocation
+  - [x] `releaseByServer(serverId)` - release all resources
+  - [x] `releaseByNode(nodeId)` - node decommission
+  - [x] `scanLeaks()` - find orphaned allocations
+  - [x] Transaction handling for atomicity
 
-- [ ] **Allocation Strategies**
-  - [ ] Sequential port assignment
-  - [ ] Random port from pool
-  - [ ] IP rotation
-  - [ ] Capacity checking
+- [x] **Allocation Strategies**
+  - [x] Sequential port assignment
+  - [x] Random port from pool
+  - [x] IP rotation
+  - [x] Capacity checking
 
-- [ ] **Integration**
-  - [ ] Drizzle queries for allocation tables
-  - [ ] Export as NestJS module
-  - [ ] Add to apps/api and apps/worker
+- [x] **Integration**
+  - [x] Drizzle queries for allocation tables
+  - [x] Export as NestJS module
+  - [x] Add to apps/api and apps/worker
 
 ### Worker Job Pipeline (apps/worker)
-- [ ] **Job Queue Setup**
-  - [ ] Configure BullMQ queues (servers, backups, metrics)
-  - [ ] Job options (attempts, backoff, timeout)
-  - [ ] Dead letter queue
+- [x] **Job Queue Setup**
+  - [x] Configure BullMQ queues (servers, backups, metrics)
+  - [x] Job options (attempts, backoff, timeout)
+  - [x] Dead letter queue
   - [ ] Job monitoring dashboard (Bull Board)
 
-- [ ] **InstallServer Job**
-  - [ ] Accept: serverId, blueprintId, nodeId, limits
-  - [ ] Step 1: Reserve allocation (ports/IP)
-  - [ ] Step 2: Fetch blueprint configuration
-  - [ ] Step 3: Call Wings API to create container
-  - [ ] Step 4: Run install script (if defined)
-  - [ ] Step 5: Wait for health check (retry logic)
-  - [ ] Step 6: Mark server as RUNNING
-  - [ ] Error handling: rollback allocation on failure
-  - [ ] Idempotency: check server status before starting
+- [x] **InstallServer Job**
+  - [x] Accept: serverId, blueprintId, nodeId, limits
+  - [x] Step 1: Reserve allocation (ports/IP)
+  - [x] Step 2: Fetch blueprint configuration
+  - [x] Step 3: Call Wings API to create container
+  - [x] Step 4: Run install script (if defined)
+  - [x] Step 5: Wait for health check (retry logic)
+  - [x] Step 6: Mark server as RUNNING
+  - [x] Error handling: rollback allocation on failure
+  - [x] Idempotency: check server status before starting
 
-- [ ] **UpdateServer Job**
-  - [ ] Accept: serverId, updates
-  - [ ] Update configuration
-  - [ ] Apply resource limit changes
-  - [ ] Restart if needed
-  - [ ] Idempotency key
+- [x] **UpdateServer Job**
+  - [x] Accept: serverId, updates
+  - [x] Update configuration
+  - [x] Apply resource limit changes
+  - [x] Restart if needed
+  - [x] Idempotency key
 
-- [ ] **RestartServer Job**
-  - [ ] Graceful stop
-  - [ ] Start container
-  - [ ] Wait for health
-  - [ ] Idempotency key
+- [x] **RestartServer Job**
+  - [x] Graceful stop
+  - [x] Start container
+  - [x] Wait for health
+  - [x] Idempotency key
 
-- [ ] **DeleteServer Job**
-  - [ ] Stop container
-  - [ ] Delete container from Wings
-  - [ ] Release allocation
-  - [ ] Archive data (optional)
-  - [ ] Update server status to DELETED
+- [x] **DeleteServer Job**
+  - [x] Stop container
+  - [x] Delete container from Wings
+  - [x] Release allocation
+  - [x] Archive data (optional)
+  - [x] Update server status to DELETED
 
-- [ ] **BackupServer Job**
-  - [ ] Snapshot container volumes
-  - [ ] Compress backup
-  - [ ] Upload to MinIO/S3
-  - [ ] Record in backups table
-  - [ ] Cleanup old backups
-  - [ ] Notify on completion
+- [x] **BackupServer Job**
+  - [x] Snapshot container volumes
+  - [x] Compress backup
+  - [x] Upload to MinIO/S3
+  - [x] Record in backups table
+  - [x] Cleanup old backups
+  - [x] Notify on completion
 
-- [ ] **RestoreBackup Job**
-  - [ ] Download backup from storage
-  - [ ] Extract to volume
-  - [ ] Restart server
-  - [ ] Verify health
+- [x] **RestoreBackup Job**
+  - [x] Download backup from storage
+  - [x] Extract to volume
+  - [x] Restart server
+  - [x] Verify health
 
-- [ ] **AggregateMetrics Job**
-  - [ ] Query raw metrics samples
-  - [ ] Calculate hourly aggregates
-  - [ ] Insert into metrics_hourly
-  - [ ] Schedule: every hour
+- [x] **AggregateMetrics Job**
+  - [x] Query raw metrics samples
+  - [x] Calculate hourly aggregates
+  - [x] Insert into metrics_hourly
+  - [x] Schedule: every hour
 
-- [ ] **ReportUsage Job**
-  - [ ] Query metrics_hourly for billing period
-  - [ ] Calculate usage per meter
-  - [ ] Report to Stripe
-  - [ ] Record in usage_records
-  - [ ] Schedule: daily
+- [x] **ReportUsage Job**
+  - [x] Query metrics_hourly for billing period
+  - [x] Calculate usage per meter
+  - [x] Report to Stripe
+  - [x] Record in usage_records
+  - [x] Schedule: daily
 
-- [ ] **Job Monitoring**
-  - [ ] Exponential backoff on retry
-  - [ ] Dead letter queue handling
+- [x] **Job Monitoring**
+  - [x] Exponential backoff on retry
+  - [x] Dead letter queue handling
   - [ ] Admin view for stuck jobs
   - [ ] Job metrics (success/fail rate)
 

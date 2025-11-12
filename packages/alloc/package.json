@@ -12,6 +12,7 @@
   "dependencies": {
     "@mambaPanel/db": "workspace:*",
     "@mambaPanel/types": "workspace:*",
+    "@nestjs/common": "^10.3.3",
     "drizzle-orm": "^0.30.0"
   },
   "devDependencies": {
