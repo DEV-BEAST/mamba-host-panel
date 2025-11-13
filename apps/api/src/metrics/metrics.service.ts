@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../common/database/database.module';
-import { hourlyMetricsAgg, rawMetricsSamples } from '@mambaPanel/db';
-import { eq, and, gte, lte, desc } from 'drizzle-orm';
+import { metricsHourly, metricsSamples } from '@mambaPanel/db';
+import { eq, and, gte, lte, desc } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 import { ServersService } from '../servers/servers.service';
 
@@ -31,15 +31,15 @@ export class MetricsService {
     // Query hourly aggregated metrics
     const metrics = await this.dbConnection.db
       .select()
-      .from(hourlyMetricsAgg)
+      .from(metricsHourly)
       .where(
         and(
-          eq(hourlyMetricsAgg.serverId, serverId),
-          gte(hourlyMetricsAgg.hourBucket, startDate),
-          lte(hourlyMetricsAgg.hourBucket, endDate)
+          eq(metricsHourly.serverId, serverId),
+          gte(metricsHourly.hourTimestamp, startDate),
+          lte(metricsHourly.hourTimestamp, endDate)
         )
       )
-      .orderBy(desc(hourlyMetricsAgg.hourBucket))
+      .orderBy(desc(metricsHourly.hourTimestamp))
       .limit(168); // Max 1 week (7 * 24 hours)
 
     return metrics;
@@ -55,9 +55,9 @@ export class MetricsService {
     // Get most recent raw sample
     const [sample] = await this.dbConnection.db
       .select()
-      .from(rawMetricsSamples)
-      .where(eq(rawMetricsSamples.serverId, serverId))
-      .orderBy(desc(rawMetricsSamples.timestamp))
+      .from(metricsSamples)
+      .where(eq(metricsSamples.serverId, serverId))
+      .orderBy(desc(metricsSamples.timestamp))
       .limit(1);
 
     if (!sample) {
