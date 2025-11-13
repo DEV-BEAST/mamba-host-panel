@@ -11,7 +11,7 @@ export class CreateTenantDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({
     description: 'Unique slug for the tenant (auto-generated from name if not provided)',
