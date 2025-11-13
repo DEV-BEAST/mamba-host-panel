@@ -155,7 +155,7 @@ export default function AdminPage() {
                       <div className="h-3 w-3 rounded-full bg-primary" />
                       <span className="font-medium capitalize">{status}</span>
                     </div>
-                    <Badge variant="secondary">{count}</Badge>
+                    <Badge variant="secondary">{count as number}</Badge>
                   </div>
                 ))}
               </div>
@@ -190,7 +190,7 @@ export default function AdminPage() {
                       />
                       <span className="font-medium capitalize">{status}</span>
                     </div>
-                    <Badge variant="secondary">{count}</Badge>
+                    <Badge variant="secondary">{count as number}</Badge>
                   </div>
                 ))}
               </div>
