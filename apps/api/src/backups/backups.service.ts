@@ -7,7 +7,7 @@ import {
 import { DATABASE_CONNECTION } from '../common/database/database.module';
 import { BACKUP_QUEUE } from '../common/queue/queue.module';
 import { backups, servers } from '@mambaPanel/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 import type { Queue } from 'bullmq';
 import { ServersService } from '../servers/servers.service';
@@ -69,7 +69,10 @@ export class BackupsService {
       .insert(backups)
       .values({
         serverId,
+        tenantId: server.tenantId,
+        name: `backup-${Date.now()}`,
         status: 'pending',
+        backupType: 'manual',
       })
       .returning();
 
@@ -96,7 +99,7 @@ export class BackupsService {
     await this.backupQueue.add('restore-backup', {
       serverId,
       backupId,
-      s3Key: backup.s3Key,
+      s3Key: backup.storagePath,
     });
 
     return { success: true, message: 'Restore queued' };
