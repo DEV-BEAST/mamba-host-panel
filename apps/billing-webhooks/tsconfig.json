@@ -2,7 +2,7 @@
   "extends": "@mambaPanel/config/typescript/base.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Node",
     "outDir": "./dist",
     "baseUrl": "./",
     "skipLibCheck": true,
@@ -11,10 +11,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "../../packages/db/src/**/*",
-    "../../packages/types/src/**/*"
-  ],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
