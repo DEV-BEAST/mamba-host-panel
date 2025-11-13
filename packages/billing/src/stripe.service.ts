@@ -11,7 +11,7 @@ export class StripeService {
   constructor(apiKey: string) {
     this.stripe = new Stripe(apiKey, {
       apiVersion: '2024-11-20.acacia',
-    });
+    } as any);
   }
 
   // Product Management
