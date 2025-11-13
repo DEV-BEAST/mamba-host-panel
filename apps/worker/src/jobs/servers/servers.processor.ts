@@ -1,10 +1,9 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger, Inject } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { InjectDrizzle } from '../../common/database/database.module';
+import { InjectDrizzle } from '../../common/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
-import { servers, allocations, blueprints, nodes, serverLogs } from '@mambaPanel/db';
-import { eq, and } from 'drizzle-orm';
+import { servers, allocations, blueprints, nodes, auditLogs, eq, and } from '@mambaPanel/db';
 import { ResourceAllocator, RESOURCE_ALLOCATOR } from '@mambaPanel/alloc';
 
 /**
@@ -23,7 +22,7 @@ export interface InstallServerJobData {
   nodeId: string;
   cpuLimitMillicores: number;
   memLimitMb: number;
-  diskLimitMb: number;
+  diskGb: number;
   variables?: Record<string, string>;
 }
 
@@ -31,7 +30,7 @@ export interface UpdateServerJobData {
   serverId: string;
   cpuLimitMillicores?: number;
   memLimitMb?: number;
-  diskLimitMb?: number;
+  diskGb?: number;
   variables?: Record<string, string>;
 }
 
@@ -84,7 +83,7 @@ export class ServersProcessor extends WorkerHost {
   }
 
   private async installServer(job: Job<InstallServerJobData>) {
-    const { serverId, blueprintId, nodeId, cpuLimitMillicores, memLimitMb, diskLimitMb, variables } = job.data;
+    const { serverId, blueprintId, nodeId, cpuLimitMillicores, memLimitMb, diskGb, variables } = job.data;
 
     this.logger.log(`Installing server ${serverId} on node ${nodeId}`);
 
@@ -93,19 +92,13 @@ export class ServersProcessor extends WorkerHost {
       await job.updateProgress(10);
       this.logger.log(`Reserving allocation for server ${serverId}`);
 
-      const allocation = await this.allocator.reserveAllocation(
-        nodeId,
+      const allocation = await this.allocator.allocate(
         serverId,
-        1, // ports needed
-        'tcp',
-        'sequential' // strategy
+        nodeId,
+        [{ protocol: 'tcp', count: 1 }]
       );
 
-      if (!allocation) {
-        throw new Error(`Failed to allocate resources for server ${serverId} on node ${nodeId}`);
-      }
-
-      const portList = allocation.ports.map(p => p.port).join(',');
+      const portList = allocation.ports.map((p: { port: number; protocol: string }) => p.port).join(',');
       this.logger.log(`Allocated ${allocation.ipAddress}:${portList} for server ${serverId}`);
 
       await this.logServerEvent(serverId, 'info', `Allocated ${allocation.ipAddress}:${allocation.ports[0].port}`);
@@ -142,14 +135,14 @@ export class ServersProcessor extends WorkerHost {
         image: blueprint.dockerImage,
         cpu_limit: cpuLimitMillicores,
         memory_limit: memLimitMb,
-        disk_limit: diskLimitMb,
-        ports: allocation.ports.map(p => ({
+        disk_limit: diskGb,
+        ports: allocation.ports.map((p: { port: number; protocol: string }) => ({
           port: p.port,
           protocol: p.protocol,
         })),
         ip_address: allocation.ipAddress,
         environment: {
-          ...blueprint.defaultVariables,
+          ...(blueprint.variables as Record<string, any> || {}),
           ...variables,
         },
         startup_command: blueprint.startupCommand,
@@ -212,8 +205,7 @@ export class ServersProcessor extends WorkerHost {
       await this.db
         .update(servers)
         .set({
-          status: 'running',
-          installedAt: new Date(),
+          status: 'online',
         })
         .where(eq(servers.id, serverId));
 
@@ -232,8 +224,8 @@ export class ServersProcessor extends WorkerHost {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to install server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Installation failed: ${error.message}`);
+      this.logger.error(`Failed to install server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Installation failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
 
       // Mark server as failed
       await this.db
@@ -243,9 +235,9 @@ export class ServersProcessor extends WorkerHost {
 
       // Release allocation if it was created
       try {
-        await this.allocator.releaseAllocation(serverId);
+        await this.allocator.releaseByServer(serverId);
       } catch (releaseError) {
-        this.logger.error(`Failed to release allocation for ${serverId}: ${releaseError.message}`);
+        this.logger.error(`Failed to release allocation for ${serverId}: ${(releaseError instanceof Error ? releaseError.message : "Unknown error")}`);
       }
 
       throw error;
@@ -253,7 +245,7 @@ export class ServersProcessor extends WorkerHost {
   }
 
   private async updateServer(job: Job<UpdateServerJobData>) {
-    const { serverId, cpuLimitMillicores, memLimitMb, diskLimitMb, variables } = job.data;
+    const { serverId, cpuLimitMillicores, memLimitMb, diskGb, variables } = job.data;
 
     this.logger.log(`Updating server ${serverId}`);
 
@@ -277,7 +269,7 @@ export class ServersProcessor extends WorkerHost {
       const updates: Partial<typeof servers.$inferInsert> = {};
       if (cpuLimitMillicores !== undefined) updates.cpuLimitMillicores = cpuLimitMillicores;
       if (memLimitMb !== undefined) updates.memLimitMb = memLimitMb;
-      if (diskLimitMb !== undefined) updates.diskLimitMb = diskLimitMb;
+      if (diskGb !== undefined) updates.diskGb = diskGb;
 
       await job.updateProgress(30);
 
@@ -320,8 +312,8 @@ export class ServersProcessor extends WorkerHost {
 
       return { success: true, serverId };
     } catch (error) {
-      this.logger.error(`Failed to update server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Update failed: ${error.message}`);
+      this.logger.error(`Failed to update server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Update failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
       throw error;
     }
   }
@@ -365,7 +357,7 @@ export class ServersProcessor extends WorkerHost {
 
       await this.db
         .update(servers)
-        .set({ status: 'stopped' })
+        .set({ status: 'offline' })
         .where(eq(servers.id, serverId));
 
       // Step 2: Start the server
@@ -402,7 +394,7 @@ export class ServersProcessor extends WorkerHost {
 
       await this.db
         .update(servers)
-        .set({ status: 'running' })
+        .set({ status: 'online' })
         .where(eq(servers.id, serverId));
 
       await this.logServerEvent(serverId, 'success', 'Server restarted successfully');
@@ -413,8 +405,8 @@ export class ServersProcessor extends WorkerHost {
 
       return { success: true, serverId };
     } catch (error) {
-      this.logger.error(`Failed to restart server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Restart failed: ${error.message}`);
+      this.logger.error(`Failed to restart server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Restart failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
 
       await this.db
         .update(servers)
@@ -446,7 +438,7 @@ export class ServersProcessor extends WorkerHost {
       await this.logServerEvent(serverId, 'info', 'Deleting server');
 
       // Step 1: Stop the server if it's running
-      if (server.status === 'running' || server.status === 'starting') {
+      if (server.status === 'online' || server.status === 'starting') {
         await job.updateProgress(20);
         await this.logServerEvent(serverId, 'info', 'Stopping server before deletion');
 
@@ -475,7 +467,7 @@ export class ServersProcessor extends WorkerHost {
       // Step 3: Release allocation
       await this.logServerEvent(serverId, 'info', 'Releasing port allocation');
 
-      await this.allocator.releaseAllocation(serverId);
+      await this.allocator.releaseByServer(serverId);
 
       this.logger.log(`Released allocation for server ${serverId}`);
 
@@ -485,8 +477,7 @@ export class ServersProcessor extends WorkerHost {
       await this.db
         .update(servers)
         .set({
-          status: 'deleted',
-          deletedAt: new Date(),
+          status: 'failed',
         })
         .where(eq(servers.id, serverId));
 
@@ -498,8 +489,8 @@ export class ServersProcessor extends WorkerHost {
 
       return { success: true, serverId };
     } catch (error) {
-      this.logger.error(`Failed to delete server ${serverId}: ${error.message}`, error.stack);
-      await this.logServerEvent(serverId, 'error', `Deletion failed: ${error.message}`);
+      this.logger.error(`Failed to delete server ${serverId}: ${(error instanceof Error ? error.message : "Unknown error")}`, (error instanceof Error ? error.stack : undefined));
+      await this.logServerEvent(serverId, 'error', `Deletion failed: ${(error instanceof Error ? error.message : "Unknown error")}`);
       throw error;
     }
   }
@@ -542,14 +533,16 @@ export class ServersProcessor extends WorkerHost {
    */
   private async logServerEvent(serverId: string, level: 'info' | 'warning' | 'error' | 'success', message: string) {
     try {
-      await this.db.insert(serverLogs).values({
-        serverId,
-        level,
-        message,
-        timestamp: new Date(),
+      // Use audit logs instead of server logs
+      await this.db.insert(auditLogs).values({
+        actorType: 'system',
+        action: `server.${level}`,
+        resourceType: 'server',
+        resourceId: serverId,
+        metadata: { message, level },
       });
     } catch (error) {
-      this.logger.error(`Failed to log server event: ${error.message}`);
+      this.logger.error(`Failed to log server event: ${(error instanceof Error ? error.message : "Unknown error")}`);
     }
   }
 
