@@ -41,7 +41,8 @@
     "rxjs": "^7.8.1",
     "superjson": "^2.2.1",
     "zod": "^3.22.4",
-    "@nestjs/config": "^4.0.2"
+    "@nestjs/config": "^4.0.2",
+    "@mambaPanel/security": "workspace:*"
   },
   "devDependencies": {
     "@mambaPanel/config": "workspace:*",

@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@nestjs/platform-fastify':
+        specifier: ^10.3.3
+        version: 10.4.20(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.20(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@10.4.20)(reflect-metadata@0.2.2)(rxjs@7.8.2))
     devDependencies:
       '@types/node':
         specifier: ^20.11.19
@@ -26,6 +30,9 @@ importers:
       '@mambaPanel/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@mambaPanel/security':
+        specifier: workspace:*
+        version: link:../../packages/security
       '@mambaPanel/types':
         specifier: workspace:*
         version: link:../../packages/types
