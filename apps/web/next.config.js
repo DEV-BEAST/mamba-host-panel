@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@mambaPanel/ui', '@mambaPanel/types'],
+  transpilePackages: [
+    '@mambaPanel/ui',
+    '@mambaPanel/types',
+    '@mambaPanel/api-types',
+  ],
   eslint: {
     ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
 };
 

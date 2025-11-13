@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { use } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Play, Square, RotateCw, Trash2 } from 'lucide-react';

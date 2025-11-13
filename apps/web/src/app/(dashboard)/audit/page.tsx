@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
 import { FileText, Filter, Calendar, User, Server } from 'lucide-react';
 import {

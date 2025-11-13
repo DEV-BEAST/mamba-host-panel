@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { Shield, Server, Users, HardDrive, Activity } from 'lucide-react';
 import {
   Button,
