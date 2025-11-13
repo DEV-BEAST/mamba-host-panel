@@ -7,7 +7,7 @@ export class InviteMemberDto {
     example: 'user@example.com',
   })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'Role to assign to the member',
@@ -15,5 +15,5 @@ export class InviteMemberDto {
     example: 'member',
   })
   @IsEnum(['admin', 'support', 'member'])
-  role: 'admin' | 'support' | 'member';
+  role!: 'admin' | 'support' | 'member';
 }
