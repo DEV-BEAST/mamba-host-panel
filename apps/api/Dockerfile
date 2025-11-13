@@ -7,16 +7,14 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
-COPY packages/types/package.json ./packages/types/
-COPY packages/db/package.json ./packages/db/
-COPY packages/config/package.json ./packages/config/
+COPY packages/*/package.json ./packages/
 RUN pnpm install --frozen-lockfile
 
 # Builder stage
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm --filter @gamePanel/api build
+RUN pnpm --filter @mambaPanel/api build
 
 # Production stage
 FROM base AS runner
