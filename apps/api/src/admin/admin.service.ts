@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../common/database/database.module';
 import { tenants, nodes, servers, users } from '@mambaPanel/db';
-import { sql } from 'drizzle-orm';
+import { sql } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 
 @Injectable()
