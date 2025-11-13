@@ -4,7 +4,8 @@
     "baseUrl": "./",
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@mambaPanel/security": ["../../packages/security/src"]
     }
   },
   "include": ["src/**/*"],
