@@ -11,7 +11,7 @@ export class CreateServerDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({
     description: 'Server description',
@@ -26,14 +26,14 @@ export class CreateServerDto {
     example: 'uuid-here',
   })
   @IsUUID()
-  blueprintId: string;
+  blueprintId!: string;
 
   @ApiProperty({
     description: 'Node ID where server will be deployed',
     example: 'uuid-here',
   })
   @IsUUID()
-  nodeId: string;
+  nodeId!: string;
 
   @ApiProperty({
     description: 'CPU limit in millicores (1000 = 1 core)',
@@ -42,7 +42,7 @@ export class CreateServerDto {
   })
   @IsNumber()
   @Min(100)
-  cpuLimitMillicores: number;
+  cpuLimitMillicores!: number;
 
   @ApiProperty({
     description: 'Memory limit in MB',
@@ -51,7 +51,7 @@ export class CreateServerDto {
   })
   @IsNumber()
   @Min(256)
-  memLimitMb: number;
+  memLimitMb!: number;
 
   @ApiProperty({
     description: 'Disk limit in GB',
@@ -60,5 +60,5 @@ export class CreateServerDto {
   })
   @IsNumber()
   @Min(1)
-  diskGb: number;
+  diskGb!: number;
 }
