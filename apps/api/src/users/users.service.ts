@@ -1,7 +1,7 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../common/database/database.module';
 import { users } from '@mambaPanel/db';
-import { eq } from 'drizzle-orm';
+import { eq } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 
 @Injectable()
