@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { InjectDrizzle } from './database/database.module';
+import { InjectDrizzle } from '../database/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
 import { nodes } from '@mambaPanel/db';
 import { eq } from '@mambaPanel/db';
