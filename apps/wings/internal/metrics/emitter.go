@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -179,8 +178,8 @@ func (e *Emitter) collectContainerStats(serverID, containerID string) (*Sample, 
 
 	// Disk usage (approximation from container stats)
 	diskUsageMB := int64(0)
-	if containerStats.StorageStats.WriteSizeBytes != nil {
-		diskUsageMB = int64(*containerStats.StorageStats.WriteSizeBytes / 1024 / 1024)
+	if containerStats.StorageStats.WriteSizeBytes > 0 {
+		diskUsageMB = int64(containerStats.StorageStats.WriteSizeBytes / 1024 / 1024)
 	}
 
 	// Network egress (bytes sent since last sample)
@@ -327,7 +326,7 @@ func (e *Emitter) Heartbeat() error {
 	}
 
 	endpoint := fmt.Sprintf("/nodes/%s/heartbeat", e.nodeID)
-	resp, err := e.apiClient.Post(endpoint, bytes.NewReader(data).Bytes())
+	resp, err := e.apiClient.Post(endpoint, data)
 	if err != nil {
 		return fmt.Errorf("failed to send heartbeat: %w", err)
 	}
