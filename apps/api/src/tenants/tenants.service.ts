@@ -9,7 +9,7 @@ import {
 import { DATABASE_CONNECTION } from '../common/database/database.module';
 import { REDIS_CLIENT } from '../common/redis/redis.module';
 import { tenants, tenantMembers, users } from '@mambaPanel/db';
-import { eq, and, or } from 'drizzle-orm';
+import { eq, and, or } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 import type Redis from 'ioredis';
 import { CreateTenantDto } from './dto/create-tenant.dto';
