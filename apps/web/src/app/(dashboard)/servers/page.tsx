@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Plus, Server as ServerIcon, Play, Square, RotateCw, AlertCircle } from 'lucide-react';
 import {
