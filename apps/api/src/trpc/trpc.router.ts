@@ -1,12 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
-import { TrpcService } from './trpc.service';
+import { initTRPC } from '@trpc/server';
+import superjson from 'superjson';
+import { TrpcService, Context } from './trpc.service';
 import { UsersService } from '../users/users.service';
 import { ServersService } from '../servers/servers.service';
 
+// Initialize tRPC once for type stability
+const t = initTRPC.context<Context>().create({
+  transformer: superjson,
+});
+
+// Create a dummy router for type extraction
+// This will be replaced at runtime by the NestJS service
+const dummyRouter = t.router({
+  users: t.router({
+    getProfile: t.procedure.query(async () => {
+      throw new Error('Not implemented - use runtime router');
+    }),
+  }),
+  servers: t.router({
+    list: t.procedure.query(async () => {
+      throw new Error('Not implemented - use runtime router');
+    }),
+    getById: t.procedure
+      .input(z.object({ id: z.string() }))
+      .query(async () => {
+        throw new Error('Not implemented - use runtime router');
+      }),
+  }),
+});
+
+// Export the type from the dummy router
+export type AppRouter = typeof dummyRouter;
+
 @Injectable()
 export class TrpcRouter {
-  private _appRouter: ReturnType<TrpcService['router']> | null = null;
+  private _appRouter: any = null;
 
   constructor(
     private readonly trpc: TrpcService,
@@ -46,5 +76,3 @@ export class TrpcRouter {
     return this._appRouter;
   }
 }
-
-export type AppRouter = TrpcRouter['appRouter'];
