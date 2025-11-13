@@ -2,10 +2,20 @@
   "extends": "@mambaPanel/config/typescript/nest.json",
   "compilerOptions": {
     "baseUrl": "./",
+    "module": "CommonJS",
+    "moduleResolution": "Node10",
+    "skipLibCheck": true,
     "paths": {
       "@/*": ["src/*"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test"]
+  "exclude": ["node_modules", "dist", "test"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "transpileOnly": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
 }
