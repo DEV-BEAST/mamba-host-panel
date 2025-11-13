@@ -199,7 +199,7 @@ export async function checkNodeCapacity(
       sql`node_id = ${nodeId} AND status NOT IN ('deleted', 'failed')`
     );
 
-  const used = usedResources[0] || { usedCpu: 0, usedMem: 0, usedDisk: 0 };
+  const used: { usedCpu: number; usedMem: number; usedDisk: number } = usedResources[0] || { usedCpu: 0, usedMem: 0, usedDisk: 0 };
 
   // Count available ports and IPs
   const [portCount] = await db
