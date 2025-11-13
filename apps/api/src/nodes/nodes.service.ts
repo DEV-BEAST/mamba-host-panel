@@ -1,8 +1,8 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../common/database/database.module';
 import { REDIS_CLIENT } from '../common/redis/redis.module';
-import { nodes, rawMetricsSamples, auditLogs } from '@mambaPanel/db';
-import { eq } from 'drizzle-orm';
+import { nodes, metricsSamples, auditLogs } from '@mambaPanel/db';
+import { eq } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 import type Redis from 'ioredis';
 
@@ -58,7 +58,7 @@ export class NodesService {
     await this.dbConnection.db
       .update(nodes)
       .set({
-        isOnline: true,
+        status: 'online',
         lastHeartbeat: new Date(),
         updatedAt: new Date(),
       })
@@ -78,7 +78,7 @@ export class NodesService {
     }
 
     // Insert metrics into raw_metrics_samples table
-    await this.dbConnection.db.insert(rawMetricsSamples).values(
+    await this.dbConnection.db.insert(metricsSamples).values(
       samples.map((sample) => ({
         serverId: sample.serverId,
         timestamp: new Date(sample.timestamp),
@@ -107,7 +107,7 @@ export class NodesService {
     await this.dbConnection.db.insert(auditLogs).values(
       events.map((event) => ({
         tenantId: null, // System events
-        actorType: 'system',
+        actorType: 'system' as const,
         actorId: nodeId,
         action: event.action,
         resourceType: 'server',
