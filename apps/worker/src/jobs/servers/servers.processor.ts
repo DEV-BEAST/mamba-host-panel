@@ -3,7 +3,7 @@ import { Logger, Inject } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { InjectDrizzle } from '../../common/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
-import { servers, allocations, blueprints, nodes, serverLogs, eq, and } from '@mambaPanel/db';
+import { servers, allocations, blueprints, nodes, auditLogs, eq, and } from '@mambaPanel/db';
 import { ResourceAllocator, RESOURCE_ALLOCATOR } from '@mambaPanel/alloc';
 
 /**
@@ -533,11 +533,13 @@ export class ServersProcessor extends WorkerHost {
    */
   private async logServerEvent(serverId: string, level: 'info' | 'warning' | 'error' | 'success', message: string) {
     try {
-      await this.db.insert(serverLogs).values({
-        serverId,
-        level,
-        message,
-        timestamp: new Date(),
+      // Use audit logs instead of server logs
+      await this.db.insert(auditLogs).values({
+        actorType: 'system',
+        action: `server.${level}`,
+        resourceType: 'server',
+        resourceId: serverId,
+        metadata: { message, level },
       });
     } catch (error) {
       this.logger.error(`Failed to log server event: ${(error instanceof Error ? error.message : "Unknown error")}`);

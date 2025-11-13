@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { InjectDrizzle } from '../../common/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
-import { backups, servers, nodes, serverLogs, eq, and, desc } from '@mambaPanel/db';
+import { backups, servers, nodes, auditLogs, eq, and, desc } from '@mambaPanel/db';
 
 /**
  * Backup Job Processor
@@ -437,11 +437,13 @@ export class BackupsProcessor extends WorkerHost {
    */
   private async logServerEvent(serverId: string, level: 'info' | 'warning' | 'error' | 'success', message: string) {
     try {
-      await this.db.insert(serverLogs).values({
-        serverId,
-        level,
-        message,
-        timestamp: new Date(),
+      // Use audit logs instead of server logs
+      await this.db.insert(auditLogs).values({
+        actorType: 'system',
+        action: `server.${level}`,
+        resourceType: 'server',
+        resourceId: serverId,
+        metadata: { message, level },
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
