@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mambaPanel/api-types": "workspace:*",
     "@mambaPanel/types": "workspace:*",
     "@mambaPanel/ui": "workspace:*",
     "@tanstack/react-query": "^5.22.2",
