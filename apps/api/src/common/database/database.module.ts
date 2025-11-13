@@ -1,8 +1,13 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createDatabaseConnection } from '@mambaPanel/db';
 
 export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
+
+/**
+ * Custom decorator for injecting the Drizzle database instance
+ */
+export const InjectDrizzle = () => Inject(DATABASE_CONNECTION);
 
 @Global()
 @Module({
