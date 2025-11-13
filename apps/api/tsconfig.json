@@ -1,9 +1,6 @@
 {
   "extends": "@mambaPanel/config/typescript/nest.json",
   "compilerOptions": {
-    "baseUrl": "./",{
-  "extends": "@mambaPanel/config/typescript/nest.json",
-  "compilerOptions": {
     "baseUrl": "./",
     "skipLibCheck": true,
     "paths": {
@@ -18,13 +15,4 @@
       "module": "CommonJS"
     }
   }
-}
-    "skipLibCheck": true,
-    "paths": {
-      "@/*": ["src/*"],
-      "@mambaPanel/security": ["../../packages/security/src"]
-    }
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test"]
 }
