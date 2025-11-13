@@ -1,5 +1,5 @@
 import type { Database } from '@mambaPanel/db';
-import { auditLogs } from '@mambaPanel/db';
+import { auditLogs, eq, gte, lte, desc } from '@mambaPanel/db';
 import type { AuditLogEntry } from './types';
 
 /**
@@ -60,30 +60,30 @@ export class AuditLogger {
     let query = this.db.select().from(auditLogs).$dynamic();
 
     // Always scope by tenant
-    query = query.where((auditLogs, { eq }) => eq(auditLogs.tenantId, tenantId));
+    query = query.where(eq(auditLogs.tenantId, tenantId));
 
     // Add filters
     if (actorId) {
-      query = query.where((auditLogs, { eq }) => eq(auditLogs.actorId, actorId));
+      query = query.where(eq(auditLogs.actorId, actorId));
     }
     if (action) {
-      query = query.where((auditLogs, { eq }) => eq(auditLogs.action, action));
+      query = query.where(eq(auditLogs.action, action));
     }
     if (resourceType) {
-      query = query.where((auditLogs, { eq }) => eq(auditLogs.resourceType, resourceType));
+      query = query.where(eq(auditLogs.resourceType, resourceType));
     }
     if (resourceId) {
-      query = query.where((auditLogs, { eq }) => eq(auditLogs.resourceId, resourceId));
+      query = query.where(eq(auditLogs.resourceId, resourceId));
     }
     if (startDate) {
-      query = query.where((auditLogs, { gte }) => gte(auditLogs.createdAt, startDate));
+      query = query.where(gte(auditLogs.createdAt, startDate));
     }
     if (endDate) {
-      query = query.where((auditLogs, { lte }) => lte(auditLogs.createdAt, endDate));
+      query = query.where(lte(auditLogs.createdAt, endDate));
     }
 
     // Order by most recent first
-    query = query.orderBy((auditLogs, { desc }) => desc(auditLogs.createdAt));
+    query = query.orderBy(desc(auditLogs.createdAt));
 
     // Pagination
     query = query.limit(limit).offset(offset);
