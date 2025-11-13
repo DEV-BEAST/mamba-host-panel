@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectDrizzle } from '../common/database/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
 import { users, refreshTokens, emailVerificationTokens, passwordResetTokens } from '@mambaPanel/db';
-import { eq, and, gt } from 'drizzle-orm';
+import { eq, and, gt } from '@mambaPanel/db';
 import { hash, compare } from 'bcrypt';
 import {
   generateRefreshToken,
