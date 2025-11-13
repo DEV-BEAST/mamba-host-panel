@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -239,8 +240,8 @@ func (g *Guard) restartContainer(containerID, serverID string) error {
 		zap.String("containerID", containerID[:12]))
 
 	// Use Docker restart with timeout
-	timeout := 30 * time.Second
-	if err := g.dockerClient.ContainerRestart(g.ctx, containerID, &timeout); err != nil {
+	timeout := 30
+	if err := g.dockerClient.ContainerRestart(g.ctx, containerID, container.StopOptions{Timeout: &timeout}); err != nil {
 		return fmt.Errorf("failed to restart container: %w", err)
 	}
 
