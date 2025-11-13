@@ -11,7 +11,7 @@ import { Logger } from '@nestjs/common';
 @WebSocketGateway({ path: '/ws' })
 export class ServersGateway {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   private logger = new Logger('ServersGateway');
 

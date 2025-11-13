@@ -1,9 +1,9 @@
 import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { InjectDrizzle } from '../database/database.module';
+import { InjectDrizzle } from './database/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
 import { nodes } from '@mambaPanel/db';
-import { eq } from 'drizzle-orm';
+import { eq } from '@mambaPanel/db';
 
 /**
  * mTLS Middleware for Wings Node Authentication
@@ -124,7 +124,7 @@ export class MTLSMiddleware implements NestMiddleware {
         throw error;
       }
 
-      throw new UnauthorizedException('mTLS authentication failed: ' + error.message);
+      throw new UnauthorizedException('mTLS authentication failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }
 }

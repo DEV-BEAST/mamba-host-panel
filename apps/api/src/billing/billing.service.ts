@@ -1,7 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../common/database/database.module';
 import { products, subscriptions, invoices } from '@mambaPanel/db';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 import { TenantsService } from '../tenants/tenants.service';
 

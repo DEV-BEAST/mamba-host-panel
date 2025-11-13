@@ -8,7 +8,7 @@ import {
 import { DATABASE_CONNECTION } from '../common/database/database.module';
 import { SERVER_QUEUE } from '../common/queue/queue.module';
 import { servers, blueprints, nodes, tenantMembers } from '@mambaPanel/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and } from '@mambaPanel/db';
 import type { Database } from '@mambaPanel/db';
 import type { Queue } from 'bullmq';
 import { TenantsService } from '../tenants/tenants.service';
@@ -126,7 +126,7 @@ export class ServersService {
       cpuLimitMillicores: dto.cpuLimitMillicores,
       memLimitMb: dto.memLimitMb,
       diskLimitMb: dto.diskGb * 1024, // Convert GB to MB
-      variables: blueprint.defaultVariables || {},
+      variables: (blueprint.variables as Record<string, any>) || {},
     });
 
     return server;

@@ -8,5 +8,5 @@ export class PowerActionDto {
     example: 'start',
   })
   @IsEnum(['start', 'stop', 'restart', 'kill'])
-  action: 'start' | 'stop' | 'restart' | 'kill';
+  action!: 'start' | 'stop' | 'restart' | 'kill';
 }

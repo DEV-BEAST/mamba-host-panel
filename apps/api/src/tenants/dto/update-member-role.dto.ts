@@ -8,5 +8,5 @@ export class UpdateMemberRoleDto {
     example: 'admin',
   })
   @IsEnum(['admin', 'support', 'member'])
-  role: 'admin' | 'support' | 'member';
+  role!: 'admin' | 'support' | 'member';
 }

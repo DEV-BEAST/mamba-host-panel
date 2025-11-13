@@ -2,6 +2,7 @@
   "extends": "@mambaPanel/config/typescript/nest.json",
   "compilerOptions": {
     "baseUrl": "./",
+    "skipLibCheck": true,
     "paths": {
       "@/*": ["src/*"]
     }
