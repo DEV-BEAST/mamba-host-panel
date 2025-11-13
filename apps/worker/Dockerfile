@@ -6,7 +6,7 @@ WORKDIR /app
 # Dependencies stage
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/api/package.json ./apps/api/
+COPY apps/worker/package.json ./apps/worker/
 COPY packages/*/package.json ./packages/
 RUN pnpm install --frozen-lockfile
 
@@ -14,7 +14,7 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm --filter @mambaPanel/api build
+RUN pnpm --filter @mambaPanel/worker build
 
 # Production stage
 FROM base AS runner
@@ -24,14 +24,10 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
 
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/apps/api/package.json ./apps/api/
+COPY --from=builder /app/apps/worker/dist ./apps/worker/dist
+COPY --from=builder /app/apps/worker/package.json ./apps/worker/
 COPY --from=builder /app/packages ./packages
 
 USER nestjs
 
-EXPOSE 3001
-
-ENV PORT 3001
-
-CMD ["node", "apps/api/dist/main.js"]
+CMD ["node", "apps/worker/dist/main.js"]
