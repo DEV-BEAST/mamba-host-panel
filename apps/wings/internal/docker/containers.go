@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"context"
 	"io"
 
 	"github.com/docker/docker/api/types"
