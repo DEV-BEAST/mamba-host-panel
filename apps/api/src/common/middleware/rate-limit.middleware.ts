@@ -1,7 +1,8 @@
 import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { Redis } from 'ioredis';
-import { RateLimiter, RateLimitConfig, getIdentifier } from '@mambaPanel/security';
+import { RateLimiter, getIdentifier } from '@mambaPanel/security';
+import type { RateLimitConfig } from '@mambaPanel/security';
 
 /**
  * Rate Limiting Middleware using Redis
