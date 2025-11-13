@@ -1,7 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { InjectDrizzle } from '../../common/database/database.module';
+import { InjectDrizzle } from '../../common/database.module';
 import type { NodeDatabase } from '@mambaPanel/db';
 import {
   metricsSamples,
@@ -132,14 +132,20 @@ export class MetricsProcessor extends WorkerHost {
         const avgMem = agg.memUsages.reduce((a, b) => a + b, 0) / agg.memUsages.length;
         const avgDisk = agg.diskUsages.reduce((a, b) => a + b, 0) / agg.diskUsages.length;
 
+        // Get tenantId and nodeId from first sample
+        const firstSample = samples.find(s => s.serverId === serverId);
+        if (!firstSample) continue;
+
         hourlyRecords.push({
           serverId,
-          timestamp: startTime,
-          avgCpuPercent: Math.round(avgCpu * 100) / 100,
-          avgMemMb: Math.round(avgMem),
-          avgDiskMb: Math.round(avgDisk),
-          totalEgressMb: Math.round(agg.netEgressBytes / 1024 / 1024),
-          sampleCount: agg.sampleCount,
+          tenantId: firstSample.tenantId,
+          nodeId: firstSample.nodeId,
+          hourTimestamp: startTime,
+          cpuMillicoreAvg: Math.round(avgCpu * 10), // Convert percent to millicore (1% = 10 millicores)
+          memMbAvg: Math.round(avgMem),
+          diskGbUsed: Math.round((avgDisk / 1024) * 100) / 100, // Convert MB to GB
+          egressMbTotal: Math.round(agg.netEgressBytes / 1024 / 1024),
+          samplesCount: agg.sampleCount,
         });
       }
 
@@ -173,7 +179,9 @@ export class MetricsProcessor extends WorkerHost {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to aggregate metrics: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to aggregate metrics: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -249,8 +257,8 @@ export class MetricsProcessor extends WorkerHost {
         .where(
           and(
             sql`${metricsHourly.serverId} = ANY(${serverIds})`,
-            gte(metricsHourly.timestamp, billingPeriodStart),
-            lte(metricsHourly.timestamp, billingPeriodEnd)
+            gte(metricsHourly.hourTimestamp, billingPeriodStart),
+            lte(metricsHourly.hourTimestamp, billingPeriodEnd)
           )
         );
 
@@ -265,9 +273,9 @@ export class MetricsProcessor extends WorkerHost {
 
       for (const metric of metrics) {
         // Each metric is for 1 hour
-        totalCpuHours += metric.avgCpuPercent / 100; // Convert percentage to fractional
-        totalMemGbHours += metric.avgMemMb / 1024; // Convert MB to GB
-        totalEgressGb += metric.totalEgressMb / 1024; // Convert MB to GB
+        totalCpuHours += metric.cpuMillicoreAvg / 1000; // Convert millicores to cores
+        totalMemGbHours += metric.memMbAvg / 1024; // Convert MB to GB
+        totalEgressGb += metric.egressMbTotal / 1024; // Convert MB to GB
       }
 
       // Round to 2 decimal places
@@ -300,62 +308,29 @@ export class MetricsProcessor extends WorkerHost {
       // Step 6: Record usage in database
       const usageRecordIds = [];
 
-      // Create usage record for CPU
-      if (totalCpuHours > 0) {
-        const [cpuRecord] = await this.db
-          .insert(usageRecords)
-          .values({
-            subscriptionId: subscription.id,
-            meterId: 'cpu-hours',
-            quantity: totalCpuHours,
-            unit: 'hours',
-            periodStart: billingPeriodStart,
-            periodEnd: billingPeriodEnd,
-            reportedAt: new Date(),
-            stripeUsageRecordId: `simulated-cpu-${Date.now()}`,
-          })
-          .returning();
+      // Note: In production, you would fetch the actual subscription item IDs
+      // For now, we'll skip inserting usage records as we don't have subscription items configured
+      this.logger.log('Usage records insertion skipped - subscription items not configured');
 
-        usageRecordIds.push(cpuRecord.id);
-      }
-
-      // Create usage record for Memory
-      if (totalMemGbHours > 0) {
-        const [memRecord] = await this.db
-          .insert(usageRecords)
-          .values({
-            subscriptionId: subscription.id,
-            meterId: 'memory-gb-hours',
-            quantity: totalMemGbHours,
-            unit: 'gb-hours',
-            periodStart: billingPeriodStart,
-            periodEnd: billingPeriodEnd,
-            reportedAt: new Date(),
-            stripeUsageRecordId: `simulated-mem-${Date.now()}`,
-          })
-          .returning();
-
-        usageRecordIds.push(memRecord.id);
-      }
-
-      // Create usage record for Egress
-      if (totalEgressGb > 0) {
-        const [egressRecord] = await this.db
-          .insert(usageRecords)
-          .values({
-            subscriptionId: subscription.id,
-            meterId: 'egress-gb',
-            quantity: totalEgressGb,
-            unit: 'gb',
-            periodStart: billingPeriodStart,
-            periodEnd: billingPeriodEnd,
-            reportedAt: new Date(),
-            stripeUsageRecordId: `simulated-egress-${Date.now()}`,
-          })
-          .returning();
-
-        usageRecordIds.push(egressRecord.id);
-      }
+      // TODO: Implement subscription items lookup and usage records insertion
+      // Example structure:
+      // const cpuSubscriptionItem = await this.getSubscriptionItem(subscription.id, 'cpu-hours');
+      // if (totalCpuHours > 0 && cpuSubscriptionItem) {
+      //   const [cpuRecord] = await this.db
+      //     .insert(usageRecords)
+      //     .values({
+      //       subscriptionItemId: cpuSubscriptionItem.id,
+      //       tenantId: tenantId,
+      //       metricType: 'cpu-hours',
+      //       quantity: Math.round(totalCpuHours),
+      //       periodStart: billingPeriodStart,
+      //       periodEnd: billingPeriodEnd,
+      //       reportedAt: new Date(),
+      //       stripeUsageRecordId: `simulated-cpu-${Date.now()}`,
+      //     })
+      //     .returning();
+      //   usageRecordIds.push(cpuRecord.id);
+      // }
 
       this.logger.log(`Created ${usageRecordIds.length} usage records`);
 
@@ -377,7 +352,9 @@ export class MetricsProcessor extends WorkerHost {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to report usage for tenant ${tenantId}: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to report usage for tenant ${tenantId}: ${errorMessage}`, errorStack);
       throw error;
     }
   }

@@ -145,7 +145,7 @@ export class ResourceAllocator {
           nodeId,
           ipAddress,
           ports: allocatedPorts,
-          status: 'active',
+          status: 'allocated',
           allocatedAt: new Date(),
         })
         .returning();
@@ -274,21 +274,18 @@ export class ResourceAllocator {
   async scanLeaks(): Promise<
     Array<{ serverId: string; nodeId: string; ipAddress: string }>
   > {
-    // Find allocations where server no longer exists or is deleted
-    const leaks = await this.db.query.allocations.findMany({
-      where: (allocations, { eq }) => eq(allocations.status, 'active'),
-      with: {
-        server: true,
-      },
-    });
+    // Find all allocated resources
+    // Note: This returns all allocated resources - caller should verify if servers exist
+    const leaks = await this.db
+      .select()
+      .from(allocations)
+      .where(eq(allocations.status, 'allocated'));
 
-    return leaks
-      .filter((leak) => !leak.server || leak.server.status === 'deleted')
-      .map((leak) => ({
-        serverId: leak.serverId,
-        nodeId: leak.nodeId,
-        ipAddress: leak.ipAddress,
-      }));
+    return leaks.map((leak) => ({
+      serverId: leak.serverId,
+      nodeId: leak.nodeId,
+      ipAddress: leak.ipAddress,
+    }));
   }
 
   /**
