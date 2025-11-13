@@ -3,7 +3,7 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 export * from './schema';
-export { eq, and, or, not, sql } from 'drizzle-orm';
+export { eq, and, or, not, sql, gte, lte, desc, gt } from 'drizzle-orm';
 
 export function createDatabaseConnection(connectionString: string) {
   const client = postgres(connectionString);
@@ -12,3 +12,4 @@ export function createDatabaseConnection(connectionString: string) {
 }
 
 export type Database = ReturnType<typeof createDatabaseConnection>['db'];
+export type NodeDatabase = Database; // Alias for backwards compatibility
