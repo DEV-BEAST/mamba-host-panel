@@ -73,12 +73,12 @@ func main() {
 
 	if apiClient != nil && mtlsConfig != nil {
 		// Start metrics emitter
-		metricsEmitter = metrics.NewEmitter(dockerClient, apiClient, mtlsConfig.NodeID, logger)
+		metricsEmitter = metrics.NewEmitter(dockerClient.GetClient(), apiClient, mtlsConfig.NodeID, logger)
 		go metricsEmitter.Start()
 		logger.Info("Metrics emitter started")
 
 		// Start crash guard
-		crashGuard = crashguard.NewGuard(dockerClient, apiClient, mtlsConfig.NodeID, logger)
+		crashGuard = crashguard.NewGuard(dockerClient.GetClient(), apiClient, mtlsConfig.NodeID, logger)
 		crashGuard.Start()
 		logger.Info("Crash guard started")
 
