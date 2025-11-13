@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Server, Settings, CreditCard, FileText, Users } from 'lucide-react';
 import { TenantSwitcher } from './tenant-switcher';
-import { cn } from '@mambaPanel/ui/lib/utils';
+import { cn } from '@mambaPanel/ui';
 
 const navigation = [
   { name: 'Servers', href: '/servers', icon: Server },

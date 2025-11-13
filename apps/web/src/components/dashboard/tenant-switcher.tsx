@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
 } from '@mambaPanel/ui';
 import { useTenants, useCurrentTenant, useSwitchTenant, useCreateTenant } from '@/hooks/use-api';
-import { cn } from '@mambaPanel/ui/lib/utils';
+import { cn } from '@mambaPanel/ui';
 
 export function TenantSwitcher() {
   const [open, setOpen] = useState(false);
