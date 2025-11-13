@@ -2,15 +2,16 @@
   "name": "@mambaPanel/types",
   "version": "1.0.0",
   "private": true,
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./server": "./src/server.ts",
-    "./user": "./src/user.ts",
-    "./wings": "./src/wings.ts"
+    ".": "./dist/index.js",
+    "./server": "./dist/server.js",
+    "./user": "./dist/user.js",
+    "./wings": "./dist/wings.js"
   },
   "scripts": {
+    "build": "tsc --project tsconfig.json",
     "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit"
   },
