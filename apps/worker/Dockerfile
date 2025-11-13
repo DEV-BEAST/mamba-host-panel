@@ -7,7 +7,19 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/worker/package.json ./apps/worker/
-COPY packages/*/package.json ./packages/
+COPY packages/types/package.json ./packages/types/
+COPY packages/db/package.json ./packages/db/
+COPY packages/config/package.json ./packages/config/
+COPY packages/api-types/package.json ./packages/api-types/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/alloc/package.json ./packages/alloc/
+COPY packages/audit/package.json ./packages/audit/
+COPY packages/authz/package.json ./packages/authz/
+COPY packages/billing/package.json ./packages/billing/
+COPY packages/blueprints/package.json ./packages/blueprints/
+COPY packages/metrics-sdk/package.json ./packages/metrics-sdk/
+COPY packages/notifications/package.json ./packages/notifications/
+COPY packages/security/package.json ./packages/security/
 RUN pnpm install --frozen-lockfile
 
 # Builder stage
