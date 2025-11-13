@@ -1,10 +1,12 @@
 {
-  "extends": "@mambaPanel/config/typescript/base.json",
+  "extends": "../config/typescript/base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
