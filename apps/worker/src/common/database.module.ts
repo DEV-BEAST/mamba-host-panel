@@ -1,8 +1,13 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createDatabaseConnection } from '@mambaPanel/db';
 
 export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
+
+/**
+ * Decorator to inject the Drizzle database instance
+ */
+export const InjectDrizzle = () => Inject(DATABASE_CONNECTION);
 
 @Global()
 @Module({
@@ -14,7 +19,8 @@ export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
         if (!connectionString) {
           throw new Error('DATABASE_URL is not defined');
         }
-        return createDatabaseConnection(connectionString);
+        const { db } = createDatabaseConnection(connectionString);
+        return db;
       },
       inject: [ConfigService],
     },
