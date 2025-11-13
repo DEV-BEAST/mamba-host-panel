@@ -12,16 +12,38 @@ export const authOptions: NextAuthConfig = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials, request) {
-        // TODO: Implement credential validation against API
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        // Placeholder - replace with actual API call
-        return {
-          id: '1',
-          email: String(credentials.email),
-          name: 'User',
-        };
+
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+          const response = await fetch(`${apiUrl}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          });
+
+          if (!response.ok) {
+            return null;
+          }
+
+          const data = await response.json();
+
+          return {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+          };
+        } catch (error) {
+          console.error('Authentication error:', error);
+          return null;
+        }
       },
     }),
     DiscordProvider({
